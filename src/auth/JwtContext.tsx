@@ -134,13 +134,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // LOGIN
   const login = async (email: string, password: string) => {
-    const response = await axios.post('/api/account/login', {
+    const response = await axios.post('/auth/login', {
       email,
       password,
     });
-    const { accessToken, user } = response.data;
+    const { access_token, user } = response.data.response[0];
+    console.log(response.data);
 
-    setSession(accessToken);
+    setSession(access_token);
 
     dispatch({
       type: Types.LOGIN,
