@@ -92,9 +92,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const initialize = useCallback(async () => {
     try {
       const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
+      const expiresTime = typeof window !== 'undefined' ? localStorage.getItem('expiresTime') : '';
 
       if (accessToken && isValidToken(accessToken)) {
-        setSession(accessToken);
+        setSession(accessToken, expiresTime);
 
         const response = await axios.get('/api/account/my-account');
 
@@ -138,10 +139,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       email,
       password,
     });
-    const { access_token, user } = response.data.response[0];
-    console.log(response.data);
+    const { access_token, user, expires_at } = response.data.response[0];
 
-    setSession(access_token);
+    setSession(access_token, expires_at);
 
     dispatch({
       type: Types.LOGIN,
@@ -173,7 +173,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // LOGOUT
   const logout = async () => {
-    setSession(null);
+    setSession(null, null);
     dispatch({
       type: Types.LOGOUT,
     });
