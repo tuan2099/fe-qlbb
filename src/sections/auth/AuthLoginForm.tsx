@@ -31,8 +31,8 @@ export default function AuthLoginForm() {
   });
 
   const defaultValues = {
-    email: 'demo@minimals.cc',
-    password: 'demo1234',
+    email: 'admin@gmail.com',
+    password: 'Admin123a@',
   };
 
   const methods = useForm<FormValuesProps>({
@@ -51,13 +51,10 @@ export default function AuthLoginForm() {
     try {
       await login(data.email, data.password);
     } catch (error) {
-      console.error(error);
-
       reset();
-
       setError('afterSubmit', {
         ...error,
-        message: error.message,
+        message: error.messages[0] || error.message,
       });
     }
   };
