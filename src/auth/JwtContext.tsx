@@ -97,9 +97,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (accessToken && isValidToken(accessToken)) {
         setSession(accessToken, expiresTime);
 
-        const response = await axios.get('/api/account/my-account');
+        const response = await axios.get('/auth/profile');
 
-        const { user } = response.data;
+        const user = response.data.response[0];
 
         dispatch({
           type: Types.INITIAL,
