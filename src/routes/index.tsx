@@ -17,6 +17,8 @@ import {
   PageFive,
   LoginPage,
   PageThree,
+  UserPage,
+  UserDetail,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -52,10 +54,8 @@ export default function Router() {
         {
           path: 'user',
           children: [
-            { element: <Navigate to="/dashboard/user/four" replace />, index: true },
-            { path: 'four', element: <PageFour /> },
-            { path: 'five', element: <PageFive /> },
-            { path: 'six', element: <PageSix /> },
+            { element: <UserPage replace />, index: true },
+            { path: ':id', element: <UserDetail /> },
           ],
         },
       ],

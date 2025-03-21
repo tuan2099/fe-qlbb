@@ -25,22 +25,26 @@ import { AuthProvider } from './auth/JwtContext';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // ----------------------------------------------------------------------
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const queryClient = new QueryClient();
 
 root.render(
-  <AuthProvider>
-    <HelmetProvider>
-      <SettingsProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <App />
-        </BrowserRouter>
-      </SettingsProvider>
-    </HelmetProvider>
-  </AuthProvider>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <HelmetProvider>
+        <SettingsProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <App />
+          </BrowserRouter>
+        </SettingsProvider>
+      </HelmetProvider>
+    </AuthProvider>
+  </QueryClientProvider>
 );
 
 // If you want your app to work offline and load faster, you can change

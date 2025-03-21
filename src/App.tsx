@@ -8,6 +8,8 @@ import ThemeLocalization from './locales';
 import SnackbarProvider from './components/snackbar';
 import { ThemeSettings } from './components/settings';
 import { MotionLazyContainer } from './components/animate';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // ----------------------------------------------------------------------
 
@@ -18,7 +20,9 @@ export default function App() {
         <ThemeSettings>
           <ThemeLocalization>
             <SnackbarProvider>
-              <Router />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Router />
+              </LocalizationProvider>
             </SnackbarProvider>
           </ThemeLocalization>
         </ThemeSettings>
