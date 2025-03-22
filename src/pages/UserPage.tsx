@@ -63,6 +63,10 @@ export default function PageOne() {
           User Page
         </Typography>
 
+        <Button sx={{ mb: 2 }} onClick={() => navigate('/dashboard/register')}>
+          Register
+        </Button>
+
         <DataTable
           columns={column}
           rows={userData?.data.response[0].data}

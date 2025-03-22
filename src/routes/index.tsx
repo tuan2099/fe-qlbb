@@ -19,6 +19,7 @@ import {
   PageThree,
   UserPage,
   UserDetail,
+  RegisterPage,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -57,6 +58,10 @@ export default function Router() {
             { element: <UserPage replace />, index: true },
             { path: ':id', element: <UserDetail /> },
           ],
+        },
+        {
+          path: 'register',
+          element: <RegisterPage />,
         },
       ],
     },

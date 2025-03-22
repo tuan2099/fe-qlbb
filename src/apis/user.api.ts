@@ -29,3 +29,10 @@ export const updateUser = ({ id, data }: { id: string | undefined; data: any }) 
       Authorization: `Bearer ${getStorage('accessToken')}`,
     },
   });
+
+export const registerUser = (data: any) =>
+  http.post(`/user`, data, {
+    headers: {
+      Authorization: `Bearer ${getStorage('accessToken')}`,
+    },
+  });
