@@ -36,3 +36,11 @@ export const registerUser = (data: any) =>
       Authorization: `Bearer ${getStorage('accessToken')}`,
     },
   });
+
+export const deleteUser = (id: any) => {
+  return http.delete(`/user/${id}`, {
+    headers: {
+      Authorization: `Bearer ${getStorage('accessToken')}`,
+    },
+  });
+};

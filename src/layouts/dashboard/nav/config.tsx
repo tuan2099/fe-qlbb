@@ -38,6 +38,11 @@ const navConfig = [
         path: PATH_DASHBOARD.user.root,
         icon: ICONS.user,
       },
+      {
+        title: 'role',
+        path: PATH_DASHBOARD.role,
+        icon: ICONS.dashboard,
+      },
     ],
   },
 ];

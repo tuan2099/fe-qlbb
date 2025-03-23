@@ -20,6 +20,7 @@ import {
   UserPage,
   UserDetail,
   RegisterPage,
+  RolePage,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -62,6 +63,10 @@ export default function Router() {
         {
           path: 'register',
           element: <RegisterPage />,
+        },
+        {
+          path: 'role',
+          element: <RolePage />,
         },
       ],
     },

@@ -1,44 +1,64 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Container, Grid, Typography } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useSnackbar } from 'notistack';
+import { LoadingButton } from '@mui/lab';
 
 import { useSettingsContext } from '../components/settings';
-import { getAllUser } from 'src/apis/user.api';
+import { deleteUser, getAllUser } from 'src/apis/user.api';
 import DataTable from 'src/components/table/Table';
-import { employeeTableColumns } from 'src/utils/column';
+import { UserTableColumns } from 'src/utils/column';
 
 // ----------------------------------------------------------------------
 
 export default function PageOne() {
   const { themeStretch } = useSettingsContext();
+  const { enqueueSnackbar } = useSnackbar();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const page = searchParams.get('page');
   const navigate = useNavigate();
 
   const column = [
-    ...employeeTableColumns,
+    ...UserTableColumns,
     {
       field: 'actions',
       headerName: '',
-      width: 150,
+      width: 250,
       renderCell: (params: any) => {
         return (
-          <Button
-            variant="contained"
-            onClick={() => {
-              navigate(`${params.row.id}`);
-            }}
-          >
-            Xem chi tiết
-          </Button>
+          <Grid>
+            <Button
+              sx={{ mr: 1 }}
+              variant="contained"
+              onClick={() => {
+                navigate(`${params.row.id}`);
+              }}
+            >
+              Xem chi tiết
+            </Button>
+            <LoadingButton
+              loading={handleDeleteUser.isPending}
+              variant="contained"
+              onClick={() => {
+                handleDeleteUser.mutate(params.row.id);
+              }}
+            >
+              Xóa
+            </LoadingButton>
+          </Grid>
         );
       },
     },
   ];
 
-  const { data: userData, isLoading } = useQuery({
+  const {
+    data: userData,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['user', page],
     queryFn: () => getAllUser({ page: page || '1' }),
   });
@@ -51,6 +71,17 @@ export default function PageOne() {
       });
     }
   }, [userData]);
+
+  const handleDeleteUser = useMutation({
+    mutationFn: (id) => deleteUser(id),
+    onSuccess: () => {
+      refetch();
+      enqueueSnackbar('Xóa thành công', { variant: 'success' });
+    },
+    onError: (err) => {
+      enqueueSnackbar(err.message, { variant: 'error' });
+    },
+  });
 
   return (
     <>

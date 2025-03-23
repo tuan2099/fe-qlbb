@@ -41,26 +41,32 @@ export function RHFMultiCheckbox({ name, options, ...other }: RHFMultiCheckboxPr
       name={name}
       control={control}
       render={({ field }) => {
-        const onSelected = (option: string) =>
-          field.value.includes(option)
-            ? field.value.filter((value: string) => value !== option)
-            : [...field.value, option];
+        const onSelected = (option: { id: any; label: string }) => {
+          const isSelected = field.value.some((item: any) => item.id === option.id);
+          return isSelected
+            ? field.value.filter((item: any) => item.id !== option.id) // Xóa nếu đã chọn
+            : [...field.value, option]; // Thêm nếu chưa chọn
+        };
 
         return (
           <FormGroup>
-            {options.map((option) => (
-              <FormControlLabel
-                key={option.value}
-                control={
-                  <Checkbox
-                    checked={field.value.includes(option.value)}
-                    onChange={() => field.onChange(onSelected(option.value))}
-                  />
-                }
-                label={option.label}
-                {...other}
-              />
-            ))}
+            {options.map((option) => {
+              return (
+                <FormControlLabel
+                  key={option.value}
+                  control={
+                    <Checkbox
+                      checked={field.value.some((item: any) => item.id === option.value)}
+                      onChange={() =>
+                        field.onChange(onSelected({ id: option.value, label: option.label }))
+                      }
+                    />
+                  }
+                  label={option.label}
+                  {...other}
+                />
+              );
+            })}
           </FormGroup>
         );
       }}
