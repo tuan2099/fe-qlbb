@@ -1,6 +1,6 @@
 import { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
-export const employeeTableColumns: GridColDef[] = [
+export const UserTableColumns: GridColDef[] = [
   {
     field: 'id',
     headerName: 'User ID',
@@ -66,5 +66,29 @@ export const employeeTableColumns: GridColDef[] = [
     valueGetter: (params: any) => {
       return params.map((item: any) => item.name).join(', ');
     },
+  },
+];
+
+export const RoleTableColumns: GridColDef[] = [
+  {
+    field: 'id',
+    headerName: 'User ID',
+    width: 130,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'code',
+    headerName: 'CODE',
+    width: 450,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'name',
+    headerName: 'Name',
+    width: 450,
+    sortable: false,
+    disableColumnMenu: true,
   },
 ];

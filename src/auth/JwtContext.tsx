@@ -73,6 +73,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
       user: null,
     };
   }
+
   return state;
 };
 
@@ -97,9 +98,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (accessToken && isValidToken(accessToken)) {
         setSession(accessToken, expiresTime);
 
-        const response = await axios.get('/auth/profile');
+        const profile = await axios.get('/auth/profile');
 
-        const user = response.data.response[0];
+        const user = profile.data.response[0];
 
         dispatch({
           type: Types.INITIAL,

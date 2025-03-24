@@ -24,8 +24,14 @@ import { LoadingButton } from '@mui/lab';
 import { useSettingsContext } from '../components/settings';
 import { getUser, updateUser } from 'src/apis/user.api';
 import LoadingScreen from 'src/components/loading-screen';
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import FormProvider, {
+  RHFCheckbox,
+  RHFMultiCheckbox,
+  RHFSelect,
+  RHFTextField,
+} from 'src/components/hook-form';
 import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
+import { getRoles } from 'src/apis/role.api';
 
 interface User {
   avatar: string | null;
@@ -45,6 +51,7 @@ type FormValuesProps = {
   gender: string;
   position: string;
   birthday: string;
+  roles: number[];
 };
 
 const UserDetail = () => {
@@ -84,6 +91,11 @@ const UserDetail = () => {
     enabled: Boolean(id),
   });
 
+  const { data: RoleData } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => getRoles({ page: '1' }),
+  });
+
   useEffect(() => {
     if (userData) {
       reset({
@@ -91,6 +103,7 @@ const UserDetail = () => {
         gender: userData.data.response[0].gender,
         position: userData.data.response[0].position,
         birthday: userData.data.response[0].birthday,
+        roles: userData.data.response[0].roles,
       });
     }
   }, [userData]);
@@ -102,13 +115,18 @@ const UserDetail = () => {
       gender: '',
       position: '',
       birthday: '',
+      roles: [],
     },
   });
 
   const { reset, handleSubmit } = methods;
 
   const handleUpdate = useMutation({
-    mutationFn: (data: FormValuesProps) => updateUser({ id, data }),
+    mutationFn: (data: FormValuesProps) => {
+      const newData = { ...data, roles: data.roles?.map((item: any) => item.id) };
+      console.log(newData);
+      return updateUser({ id, data: newData });
+    },
     onSuccess: () => {
       handleClose();
       refetch();
@@ -228,6 +246,14 @@ const UserDetail = () => {
                 </RHFSelect>
                 <RHFTextField name="position" label="Position" />
                 <RHFDatePicker name="birthday" label="Birthday" />
+                {RoleData && (
+                  <RHFMultiCheckbox
+                    name="roles"
+                    options={RoleData?.data.response[0].data.map((item: any) => {
+                      return { label: item.name, value: item.id };
+                    })}
+                  />
+                )}
                 <LoadingButton loading={handleUpdate.isPending} type="submit" variant="contained">
                   Lưu
                 </LoadingButton>
