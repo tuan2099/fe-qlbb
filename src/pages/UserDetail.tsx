@@ -124,7 +124,6 @@ const UserDetail = () => {
   const handleUpdate = useMutation({
     mutationFn: (data: FormValuesProps) => {
       const newData = { ...data, roles: data.roles?.map((item: any) => item.id) };
-      console.log(newData);
       return updateUser({ id, data: newData });
     },
     onSuccess: () => {

@@ -1,33 +1,23 @@
 import { Helmet } from 'react-helmet-async';
-import { Container, Typography, Stack, MenuItem, Button } from '@mui/material';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { useForm } from 'react-hook-form';
+import { Button, Container, Grid, Typography } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import { LoadingButton } from '@mui/lab';
+
 import { useSettingsContext } from '../components/settings';
-import { addRole, deleteRole, getRoles } from 'src/apis/role.api';
+import { deleteRole, getRoles } from 'src/apis/role.api';
 import { useEffect } from 'react';
 import { RoleTableColumns } from 'src/utils/column';
 import DataTable from 'src/components/table/Table';
-
-type FormValue = {
-  name: string;
-};
-
-const schema = yup.object().shape({
-  name: yup.string().required('Tên không được để trống'),
-});
+import { getPermisson } from 'src/apis/permission.api';
 
 const RolePage = () => {
   const { themeStretch } = useSettingsContext();
   const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const page = searchParams.get('page');
 
   const column = [
@@ -35,18 +25,29 @@ const RolePage = () => {
     {
       field: 'actions',
       headerName: '',
-      width: 150,
+      width: 300,
       renderCell: (params: any) => {
         return (
-          <LoadingButton
-            loading={handleDeleteRole.isPending}
-            variant="contained"
-            onClick={() => {
-              handleDeleteRole.mutate(params.row.id);
-            }}
-          >
-            Xóa
-          </LoadingButton>
+          <Grid>
+            <Button
+              sx={{ mr: 1 }}
+              variant="contained"
+              onClick={() => {
+                navigate(`/dashboard/role/update/${params.row.id}`);
+              }}
+            >
+              Chỉnh sửa
+            </Button>
+            <LoadingButton
+              loading={handleDeleteRole.isPending}
+              variant="contained"
+              onClick={() => {
+                handleDeleteRole.mutate(params.row.id);
+              }}
+            >
+              Xóa
+            </LoadingButton>
+          </Grid>
         );
       },
     },
@@ -61,6 +62,11 @@ const RolePage = () => {
     queryFn: () => getRoles({ page: page || '1' }),
   });
 
+  const permisson = useQuery({
+    queryKey: ['permission'],
+    queryFn: () => getPermisson({ page: page || '1' }),
+  });
+
   useEffect(() => {
     if (page && +page > RoleData?.data.response[0].last_page) {
       setSearchParams({
@@ -70,31 +76,9 @@ const RolePage = () => {
     }
   }, [RoleData]);
 
-  const methods = useForm<FormValue>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      name: '',
-    },
-  });
-
-  const { reset, handleSubmit } = methods;
-
-  const handleAddRole = useMutation({
-    mutationFn: (data: FormValue) => addRole(data),
-    onSuccess: () => {
-      reset();
-      refetch();
-      enqueueSnackbar('Tạo thành công', { variant: 'success' });
-    },
-    onError: (err) => {
-      enqueueSnackbar(err.message, { variant: 'error' });
-    },
-  });
-
   const handleDeleteRole = useMutation({
     mutationFn: (id) => deleteRole(id),
     onSuccess: () => {
-      reset();
       refetch();
       enqueueSnackbar('Xóa thành công', { variant: 'success' });
     },
@@ -123,21 +107,6 @@ const RolePage = () => {
           to={RoleData?.data.response[0].to}
           total={RoleData?.data.response[0].total}
         />
-        <Typography variant="h3" component="h1" paragraph sx={{ mt: 10 }}>
-          Add Role
-        </Typography>
-
-        <FormProvider
-          methods={methods}
-          onSubmit={handleSubmit((data) => handleAddRole.mutate(data))}
-        >
-          <Stack spacing={3} paddingY={2}>
-            <RHFTextField name="name" label="Name" />
-            <LoadingButton loading={handleAddRole.isPending} type="submit" variant="contained">
-              Tạo mới
-            </LoadingButton>
-          </Stack>
-        </FormProvider>
       </Container>
     </>
   );
