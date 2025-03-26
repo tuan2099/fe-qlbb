@@ -25,5 +25,6 @@ export const UserPage = Loadable(lazy(() => import('../pages/UserPage')));
 export const UserDetail = Loadable(lazy(() => import('../pages/UserDetail')));
 export const RegisterPage = Loadable(lazy(() => import('../pages/RegisterPage')));
 export const RolePage = Loadable(lazy(() => import('../pages/RolePage')));
+export const AddRole = Loadable(lazy(() => import('../pages/AddRole')));
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));

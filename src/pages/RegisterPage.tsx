@@ -63,7 +63,6 @@ const RegisterPage = () => {
   const handleRegister = useMutation({
     mutationFn: (data: FormValue) => {
       const newData = { ...data, birthday: dayjs(data.birthday).format('YYYY-MM-DD') };
-      console.log(newData);
       return registerUser(newData);
     },
     onSuccess: () => {

@@ -21,6 +21,7 @@ import {
   UserDetail,
   RegisterPage,
   RolePage,
+  AddRole,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -66,7 +67,11 @@ export default function Router() {
         },
         {
           path: 'role',
-          element: <RolePage />,
+          children: [
+            { element: <RolePage replace />, index: true },
+            { path: 'add', element: <AddRole /> },
+            { path: 'update/:id', element: <AddRole /> },
+          ],
         },
       ],
     },

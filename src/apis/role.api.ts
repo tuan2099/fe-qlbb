@@ -12,6 +12,14 @@ export const getRoles = ({ page }: { page: string | null }) => {
   });
 };
 
+export const getRoleDetail = (id: string | undefined) => {
+  return http.get(`/role/${id}`, {
+    headers: {
+      Authorization: `Bearer ${getStorage('accessToken')}`,
+    },
+  });
+};
+
 export const addRole = (data: { name: string }) => {
   return http.post(`/role`, data, {
     headers: {
@@ -19,6 +27,13 @@ export const addRole = (data: { name: string }) => {
     },
   });
 };
+
+export const updateRole = ({ id, data }: { id: string | undefined; data: any }) =>
+  http.put(`/role/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${getStorage('accessToken')}`,
+    },
+  });
 
 export const deleteRole = (id: any) => {
   return http.delete(`/role/${id}`, {
