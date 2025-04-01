@@ -32,19 +32,7 @@ import FormProvider, {
 } from 'src/components/hook-form';
 import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
 import { getRoles } from 'src/apis/role.api';
-
-interface User {
-  avatar: string | null;
-  birthday: string;
-  code: string;
-  email: string;
-  gender: string;
-  id: number;
-  name: string;
-  phone: string;
-  position: string;
-  roles: { id: number; name: string }[];
-}
+import AvatarUploader from 'src/components/Avatar/AvatarUploader';
 
 type FormValuesProps = {
   phone: string;
@@ -146,12 +134,14 @@ const UserDetail = () => {
           User Page
         </Typography>
 
-        <Avatar
+        {/* <Avatar
           src={userData?.data.response[0].avatar || undefined}
           sx={{ width: 100, height: 100, mx: 'auto', mb: 2, bgcolor: 'primary.main' }}
         >
           {!userData?.data.response[0].avatar && getInitials(userData?.data.response[0].name)}
-        </Avatar>
+        </Avatar> */}
+
+        <AvatarUploader userData={userData?.data.response[0]} />
         <Typography variant="h5" gutterBottom>
           {userData?.data.response[0].name}
         </Typography>

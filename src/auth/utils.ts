@@ -70,7 +70,7 @@ export const setSession = (accessToken: string | null, expiresTime: string | nul
     // This function below will handle when token is expired
     const { exp } = jwtDecode(accessToken); // ~3 days by minimals server
 
-    tokenExpired(expiresTime);
+    // tokenExpired(expiresTime);
   } else {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('expiresTime');
