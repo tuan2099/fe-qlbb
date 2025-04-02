@@ -26,6 +26,7 @@ export const getUser = (id: string | undefined) => {
 export const updateUser = ({ id, data }: { id: string | undefined; data: any }) =>
   http.put(`/user/${id}`, data, {
     headers: {
+      'Content-Type': 'multipart/form-data',
       Authorization: `Bearer ${getStorage('accessToken')}`,
     },
   });
