@@ -235,7 +235,7 @@ const UserDetail = () => {
                 </RHFSelect>
                 <RHFTextField name="position" label="Position" />
                 <RHFDatePicker name="birthday" label="Birthday" />
-                {RoleData && (
+                {RoleData && userData?.data.response[0].position === 'admin' && (
                   <RHFMultiCheckbox
                     name="roles"
                     options={RoleData?.data.response[0].data.map((item: any) => {

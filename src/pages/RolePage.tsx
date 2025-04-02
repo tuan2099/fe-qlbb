@@ -24,8 +24,8 @@ const RolePage = () => {
     ...RoleTableColumns,
     {
       field: 'actions',
-      headerName: '',
-      width: 300,
+      headerName: 'Hành động',
+      width: 450,
       renderCell: (params: any) => {
         return (
           <Grid>
@@ -95,8 +95,12 @@ const RolePage = () => {
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          Role List
+          Danh sách quyền
         </Typography>
+
+        <Button sx={{ mb: 2 }} onClick={() => navigate('/dashboard/role/add')}>
+          Tạo quyền
+        </Button>
 
         <DataTable
           columns={column}

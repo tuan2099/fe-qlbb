@@ -16,7 +16,6 @@ import { UserTableColumns } from 'src/utils/column';
 export default function PageOne() {
   const { themeStretch } = useSettingsContext();
   const { enqueueSnackbar } = useSnackbar();
-
   const [searchParams, setSearchParams] = useSearchParams();
   const page = searchParams.get('page');
   const navigate = useNavigate();

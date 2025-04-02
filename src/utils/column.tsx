@@ -73,20 +73,13 @@ export const RoleTableColumns: GridColDef[] = [
   {
     field: 'id',
     headerName: 'User ID',
-    width: 130,
-    sortable: false,
-    disableColumnMenu: true,
-  },
-  {
-    field: 'code',
-    headerName: 'CODE',
-    width: 450,
+    width: 230,
     sortable: false,
     disableColumnMenu: true,
   },
   {
     field: 'name',
-    headerName: 'Name',
+    headerName: 'Tên quyền',
     width: 450,
     sortable: false,
     disableColumnMenu: true,
