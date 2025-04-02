@@ -43,6 +43,11 @@ const navConfig = [
         path: PATH_DASHBOARD.role,
         icon: ICONS.dashboard,
       },
+      {
+        title: 'warehouse',
+        path: PATH_DASHBOARD.warehouse,
+        icon: ICONS.dashboard,
+      },
     ],
   },
 ];
