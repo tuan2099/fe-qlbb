@@ -24,4 +24,5 @@ export const PATH_DASHBOARD = {
     six: path(ROOTS_DASHBOARD, '/user/six'),
   },
   role: path(ROOTS_DASHBOARD, '/role'),
+  warehouse: path(ROOTS_DASHBOARD, '/warehouse'),
 };

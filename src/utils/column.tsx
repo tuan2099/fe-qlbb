@@ -85,3 +85,44 @@ export const RoleTableColumns: GridColDef[] = [
     disableColumnMenu: true,
   },
 ];
+
+export const StorageTableColumns: GridColDef[] = [
+  {
+    field: 'id',
+    headerName: 'ID',
+    width: 230,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'code',
+    headerName: 'CODE',
+    width: 230,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'name',
+    headerName: 'Name',
+    width: 450,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'manager_by',
+    headerName: 'Manager By',
+    width: 450,
+    sortable: false,
+    disableColumnMenu: true,
+    valueGetter: (params: any) => {
+      return params.name;
+    },
+  },
+  {
+    field: 'note',
+    headerName: 'Note',
+    width: 450,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+];
