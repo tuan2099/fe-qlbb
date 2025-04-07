@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { Avatar, Box, IconButton, Dialog, Button } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
-import { updateUser } from 'src/apis/user.api';
+import { updateUser, uploadAvatar } from 'src/apis/user.api';
 import { useParams } from 'react-router';
 import { LoadingButton } from '@mui/lab';
+import { useSnackbar } from 'notistack';
 
 interface UserData {
   name: string;
@@ -11,14 +12,37 @@ interface UserData {
 }
 
 const AvatarUploader = ({ userData }: { userData: UserData }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const { id } = useParams();
   const [preview, setPreview] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [isChange, setIsChange] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpdate = useMutation({
-    mutationFn: (data: FormData) => {
+    mutationFn: (data: any) => {
       return updateUser({ id, data: { avatar: data } });
+    },
+    onSuccess: () => {
+      enqueueSnackbar('Thông tin đã được cập nhập.', { variant: 'success' });
+      setIsChange(false);
+      // setPreview(null);
+    },
+    onError: () => {
+      enqueueSnackbar('Có lỗi xảy ra ! Vui lòng thử lại.', { variant: 'error' });
+    },
+  });
+
+  const handleUploadImage = useMutation({
+    mutationFn: (file: any) => {
+      const data = { upload_preset: 'ml_default', file };
+      return uploadAvatar(data);
+    },
+    onSuccess: (data) => {
+      handleUpdate.mutate(data.data.secure_url);
+    },
+    onError: () => {
+      enqueueSnackbar('Có lỗi xảy ra ! Vui lòng thử lại.', { variant: 'error' });
     },
   });
 
@@ -26,15 +50,13 @@ const AvatarUploader = ({ userData }: { userData: UserData }) => {
     const file = event.target.files?.[0];
     if (file) {
       setPreview(URL.createObjectURL(file));
+      setIsChange(true);
     }
   };
 
   const handleUpload = () => {
     if (!fileInputRef.current?.files?.[0]) return;
-
-    const formData = new FormData();
-    formData.append('avatar', fileInputRef.current.files[0]);
-    handleUpdate.mutate(formData);
+    handleUploadImage.mutate(fileInputRef.current.files[0]);
   };
 
   return (
@@ -89,10 +111,10 @@ const AvatarUploader = ({ userData }: { userData: UserData }) => {
           onChange={handleFileChange}
         />
 
-        {preview && (
+        {isChange && (
           <LoadingButton
             sx={{ textAlign: 'center' }}
-            loading={handleUpdate.isPending}
+            loading={handleUpdate.isPending || handleUploadImage.isPending}
             onClick={handleUpload}
           >
             Cập nhật
