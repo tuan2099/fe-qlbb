@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { String } from 'lodash';
-
 import { getStorage } from 'src/utils/getStorage';
 import http from 'src/utils/http';
 
@@ -44,4 +42,16 @@ export const deleteUser = (id: any) => {
       Authorization: `Bearer ${getStorage('accessToken')}`,
     },
   });
+};
+
+export const uploadAvatar = ({ file, upload_preset }: { file: any; upload_preset: any }) => {
+  return axios.post(
+    'https://api.cloudinary.com/v1_1/dhm9uuyv1/image/upload',
+    { file, upload_preset },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
 };
