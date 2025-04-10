@@ -30,3 +30,6 @@ export const WarehousePage = Loadable(lazy(() => import('../pages/WarehousePage'
 export const AddWarehouse = Loadable(lazy(() => import('../pages/AddWarehouse')));
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
+
+// Dashboard User
+export const UserAccountPage = Loadable(lazy(() => import('../pages/dasshboards/UserAccountPage')));

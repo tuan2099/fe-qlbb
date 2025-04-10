@@ -17,4 +17,8 @@ export type UserType = {
   created_by: any;
 };
 
-
+export type IUserAccountChangePassword = {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
