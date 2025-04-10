@@ -28,5 +28,7 @@ export const RolePage = Loadable(lazy(() => import('../pages/RolePage')));
 export const AddRole = Loadable(lazy(() => import('../pages/AddRole')));
 export const WarehousePage = Loadable(lazy(() => import('../pages/WarehousePage')));
 export const AddWarehouse = Loadable(lazy(() => import('../pages/AddWarehouse')));
+export const SupplierPage = Loadable(lazy(() => import('../pages/SupplierPage')));
+export const AddSupplier = Loadable(lazy(() => import('../pages/AddSupplier')));
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));

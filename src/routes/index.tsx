@@ -12,9 +12,6 @@ import {
   Page404,
   PageOne,
   PageTwo,
-  PageSix,
-  PageFour,
-  PageFive,
   LoginPage,
   PageThree,
   UserPage,
@@ -24,6 +21,8 @@ import {
   AddRole,
   WarehousePage,
   AddWarehouse,
+  SupplierPage,
+  AddSupplier,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -81,6 +80,14 @@ export default function Router() {
             { element: <WarehousePage replace />, index: true },
             { path: 'add', element: <AddWarehouse /> },
             { path: 'update/:id', element: <AddWarehouse /> },
+          ],
+        },
+        {
+          path: 'supplier',
+          children: [
+            { element: <SupplierPage replace />, index: true },
+            { path: 'add', element: <AddSupplier /> },
+            { path: 'update/:id', element: <AddSupplier /> },
           ],
         },
       ],
