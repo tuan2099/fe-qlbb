@@ -14,17 +14,35 @@ const ICONS = {
   ecommerce: icon('ic_ecommerce'),
   analytics: icon('ic_analytics'),
   dashboard: icon('ic_dashboard'),
+  menuItem: icon('ic_menu_item'),
 };
 
 const navConfig = [
   // GENERAL
   // ----------------------------------------------------------------------
   {
-    subheader: 'general v4.0.0',
+    subheader: 'Thông tin diễn đàn',
     items: [
-      { title: 'One', path: PATH_DASHBOARD.one, icon: ICONS.dashboard },
-      { title: 'Two', path: PATH_DASHBOARD.two, icon: ICONS.ecommerce },
-      { title: 'Three', path: PATH_DASHBOARD.three, icon: ICONS.analytics },
+      {
+        title: 'Form nhập liệu',
+        path: '#/dashboard/menu_level',
+        icon: ICONS.menuItem,
+        children: [
+          {
+            title: 'Diễn đàn',
+            path: '#/dashboard/menu_level/menu_level_2a',
+          },
+          {
+            title: 'Sự cố',
+            path: '#/dashboard/menu_level/menu_level_2b',
+          },
+        ],
+      },
+      {
+        title: 'Thống kê',
+        path: PATH_DASHBOARD.user.root,
+        icon: ICONS.analytics,
+      },
     ],
   },
 

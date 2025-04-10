@@ -23,6 +23,7 @@ import {
   AddWarehouse,
   SupplierPage,
   AddSupplier,
+  UserAccountPage
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -60,6 +61,7 @@ export default function Router() {
           children: [
             { element: <UserPage replace />, index: true },
             { path: ':id', element: <UserDetail /> },
+            { path: 'account', element: <UserAccountPage /> },
           ],
         },
         {
