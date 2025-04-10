@@ -126,3 +126,52 @@ export const StorageTableColumns: GridColDef[] = [
     disableColumnMenu: true,
   },
 ];
+
+export const USER_TABLE_HEAD = [
+  {
+    id: 'id',
+    lable: 'User ID',
+    align: 'left',
+  },
+  {
+    id: 'code',
+    lable: 'CODE',
+    align: 'left',
+  },
+  {
+    id: 'name',
+    lable: 'Name',
+    align: 'left',
+  },
+  {
+    id: 'gender',
+    lable: 'Gender',
+    align: 'left',
+  },
+  {
+    id: 'position',
+    lable: 'Position',
+    align: 'left',
+  },
+  {
+    id: 'phone',
+    lable: 'Phone',
+    align: 'left',
+  },
+  {
+    id: 'email',
+    lable: 'Email',
+
+    align: 'left',
+  },
+  {
+    id: 'birthday',
+    lable: 'Date of birth',
+    align: 'left',
+  },
+  {
+    id: 'roles',
+    lable: 'Roles',
+    align: 'left',
+  },
+];

@@ -44,6 +44,8 @@ import { StorageTableColumns } from 'src/utils/column';
 // sections
 import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/warehouse';
 import { IWarehouse } from 'src/types/warehosue.type';
+import TablePagination from 'src/components/table/Pagination';
+import PMCTable from 'src/components/PMCTable/PMCTable';
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -83,7 +85,7 @@ export default function WarehousePage() {
     onChangeDense,
     onChangePage,
     onChangeRowsPerPage,
-  } = useTable({ defaultRowsPerPage: 10 });
+  } = useTable();
 
   const { themeStretch } = useSettingsContext();
 
@@ -119,7 +121,6 @@ export default function WarehousePage() {
     }
   }, [warehouseData]);
 
-
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
@@ -127,9 +128,6 @@ export default function WarehousePage() {
     filterCode,
     filterManager,
   });
-
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  const denseHeight = dense ? 52 : 72;
 
   const isFiltered = filterName !== '' || filterCode !== 'all' || filterManager !== 'all';
 
@@ -165,10 +163,9 @@ export default function WarehousePage() {
     mutationFn: (id: number) => deleteWarehouse(id),
     onSuccess: () => {
       refetch();
+      handleCloseConfirm();
     },
-    onError: (err) => {
-
-    },
+    onError: (err) => {},
   });
 
   const handleDeleteRow = (id: number) => {
@@ -176,20 +173,7 @@ export default function WarehousePage() {
   };
 
   const handleDeleteRows = (selected: string[]) => {
-    // const deleteRows = tableData.filter((row) => !selected.includes(row.id));
-    // setSelected([]);
-    // setTableData(deleteRows);
-
-    // if (page > 0) {
-    //   if (selected.length === dataInPage.length) {
-    //     setPage(page - 1);
-    //   } else if (selected.length === dataFiltered.length) {
-    //     setPage(0);
-    //   } else if (selected.length > dataInPage.length) {
-    //     const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
-    //     setPage(newPage);
-    //   }
-    // }
+    console.log(selected);
   };
 
   const handleEditRow = (id: number) => {
@@ -254,85 +238,27 @@ export default function WarehousePage() {
             onResetFilter={handleResetFilter}
           />
 
-          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-            <TableSelectedAction
-              dense={dense}
-              numSelected={selected.length}
-              rowCount={tableData.length}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  tableData.map((row) => row.id)
-                )
-              }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={handleOpenConfirm}>
-                    <Iconify icon="eva:trash-2-outline" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
-
-            <Scrollbar>
-              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                <TableHeadCustom
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={tableData.length}
-                  numSelected={selected.length}
-                  onSort={onSort}
-                  onSelectAllRows={(checked) =>
-                    onSelectAllRows(
-                      checked,
-                      tableData.map((row) => row.id)
-                    )
-                  }
-                />
-
-                <TableBody>
-                  {dataFiltered
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <WarehouseTableRow
-                        key={row.id}
-                        row={row}
-                        selected={selected.includes(row.id)}
-                        onSelectRow={() => onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(Number(row.id))}
-                        onEditRow={() => handleEditRow(Number(row.id))}
-                      />
-                    ))}
-
-                  <TableEmptyRows
-                    height={denseHeight}
-                    emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                  />
-
-                  <TableNoData isNotFound={isNotFound} />
-                </TableBody>
-              </Table>
-            </Scrollbar>
-          </TableContainer>
-
-          {/* <TablePaginationCustom
-            count={totalItems}
-            page={currentPage}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(event, newPage) => setPage(newPage)}
-            onRowsPerPageChange={() => { }}
-            dense={dense}
-            onChangeDense={onChangeDense}
-          /> */}
+          <PMCTable
+            TABLE_HEAD={TABLE_HEAD}
+            dataFiltered={dataFiltered}
+            isNotFound={isNotFound}
+            onDeleteRow={handleDeleteRow}
+            isDeleting={handleDeleteRole.isPending}
+            onEditRow={handleEditRow}
+            onOpenConfirm={handleOpenConfirm}
+            tableData={tableData}
+            from={warehouseData?.data.response[0].from}
+            to={warehouseData?.data.response[0].to}
+            total={warehouseData?.data.response[0].total}
+            pageSize={warehouseData?.data.response[0].last_page}
+          />
         </Card>
       </Container>
-
     </>
   );
 }
 
-function applyFilter({
+const applyFilter = ({
   inputData,
   comparator,
   filterName,
@@ -344,7 +270,7 @@ function applyFilter({
   filterName: string;
   filterCode: string;
   filterManager: string;
-}) {
+}) => {
   const stabilizedThis = inputData.map((el, index) => [el, index] as const);
 
   stabilizedThis.sort((a, b) => {
@@ -370,4 +296,4 @@ function applyFilter({
   }
 
   return inputData;
-}
+};

@@ -1,15 +1,15 @@
 import { useState } from 'react';
 // @mui
 import {
-    Stack,
-    Avatar,
-    Button,
-    Checkbox,
-    TableRow,
-    MenuItem,
-    TableCell,
-    IconButton,
-    Typography,
+  Stack,
+  Avatar,
+  Button,
+  Checkbox,
+  TableRow,
+  MenuItem,
+  TableCell,
+  IconButton,
+  Typography,
 } from '@mui/material';
 // @types
 // import { IUserAccountGeneral } from '../../../../@types/user';
@@ -18,115 +18,124 @@ import Label from '../../components/label';
 import Iconify from '../../components/iconify';
 import MenuPopover from '../../components/menu-popover';
 import ConfirmDialog from '../../components/confirm-dialog';
+import { LoadingButton } from '@mui/lab';
 
 // ----------------------------------------------------------------------
 
 type Props = {
-    row: any; // sau rồi sửa
-    selected: boolean;
-    onEditRow: VoidFunction;
-    onSelectRow: VoidFunction;
-    onDeleteRow: VoidFunction;
+  row: any; // sau rồi sửa
+  selected: boolean;
+  onEditRow: VoidFunction;
+  onSelectRow: VoidFunction;
+  onDeleteRow: VoidFunction;
+  isDeleting: boolean;
 };
 
 export default function WarehouseTableRow({
-    row,
-    selected,
-    onEditRow,
-    onSelectRow,
-    onDeleteRow,
+  row,
+  selected,
+  onEditRow,
+  onSelectRow,
+  onDeleteRow,
+  isDeleting,
 }: Props) {
-    const { name, note, manager_by } = row;
+  const { name, note, manager_by } = row;
+  console.log(row);
 
-    const [openConfirm, setOpenConfirm] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
 
-    const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
+  const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
 
-    const handleOpenConfirm = () => {
-        setOpenConfirm(true);
-    };
+  const handleOpenConfirm = () => {
+    setOpenConfirm(true);
+  };
 
-    const handleCloseConfirm = () => {
-        setOpenConfirm(false);
-    };
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
+  };
 
-    const handleOpenPopover = (event: React.MouseEvent<HTMLElement>) => {
-        setOpenPopover(event.currentTarget);
-    };
+  const handleOpenPopover = (event: React.MouseEvent<HTMLElement>) => {
+    setOpenPopover(event.currentTarget);
+  };
 
-    const handleClosePopover = () => {
-        setOpenPopover(null);
-    };
+  const handleClosePopover = () => {
+    setOpenPopover(null);
+  };
 
-    return (
-        <>
-            <TableRow hover selected={selected}>
-                <TableCell padding="checkbox">
-                    <Checkbox checked={selected} onClick={onSelectRow} />
-                </TableCell>
+  return (
+    <>
+      <TableRow hover selected={selected}>
+        <TableCell padding="checkbox">
+          <Checkbox checked={selected} onClick={onSelectRow} />
+        </TableCell>
 
-                <TableCell>
-                    <Stack direction="row" alignItems="center" spacing={2}>
-                        {/* <Avatar alt={name} src={avatarUrl} /> */}
+        <TableCell>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            {/* <Avatar alt={name} src={avatarUrl} /> */}
 
-                        <Typography variant="subtitle2" noWrap>
-                            {name}
-                        </Typography>
-                    </Stack>
-                </TableCell>
+            <Typography variant="subtitle2" noWrap>
+              {manager_by.name}
+            </Typography>
+          </Stack>
+        </TableCell>
 
-                <TableCell align="left">{note}</TableCell>
+        <TableCell align="left">{note}</TableCell>
 
-                <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-                    {manager_by.name}
-                </TableCell>
+        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
+          {name}
+        </TableCell>
 
-                <TableCell align="right">
-                    <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
-                        <Iconify icon="eva:more-vertical-fill" />
-                    </IconButton>
-                </TableCell>
-            </TableRow>
+        <TableCell align="right">
+          <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
+            <Iconify icon="eva:more-vertical-fill" />
+          </IconButton>
+        </TableCell>
+      </TableRow>
 
-            <MenuPopover
-                open={openPopover}
-                onClose={handleClosePopover}
-                arrow="right-top"
-                sx={{ width: 140 }}
-            >
-                <MenuItem
-                    onClick={() => {
-                        handleOpenConfirm();
-                        handleClosePopover();
-                    }}
-                    sx={{ color: 'error.main' }}
-                >
-                    <Iconify icon="eva:trash-2-outline" />
-                    Delete
-                </MenuItem>
+      <MenuPopover
+        open={openPopover}
+        onClose={handleClosePopover}
+        arrow="right-top"
+        sx={{ width: 140 }}
+      >
+        <MenuItem
+          onClick={() => {
+            handleOpenConfirm();
+            handleClosePopover();
+          }}
+          sx={{ color: 'error.main' }}
+        >
+          <Iconify icon="eva:trash-2-outline" />
+          Delete
+        </MenuItem>
 
-                <MenuItem
-                    onClick={() => {
-                        onEditRow();
-                        handleClosePopover();
-                    }}
-                >
-                    <Iconify icon="eva:edit-fill" />
-                    Edit
-                </MenuItem>
-            </MenuPopover>
+        <MenuItem
+          onClick={() => {
+            onEditRow();
+            handleClosePopover();
+          }}
+        >
+          <Iconify icon="eva:edit-fill" />
+          Edit
+        </MenuItem>
+      </MenuPopover>
 
-            <ConfirmDialog
-                open={openConfirm}
-                onClose={handleCloseConfirm}
-                title="Delete"
-                content="Are you sure want to delete?"
-                action={
-                    <Button variant="contained" color="error" onClick={onDeleteRow}>
-                        Delete
-                    </Button>
-                }
-            />
-        </>
-    );
+      <ConfirmDialog
+        open={openConfirm}
+        onClose={handleCloseConfirm}
+        title="Delete"
+        content="Are you sure want to delete?"
+        action={
+          <LoadingButton
+            loading={isDeleting}
+            variant="contained"
+            color="error"
+            onClick={onDeleteRow}
+          >
+            Delete
+          </LoadingButton>
+        }
+      />
+    </>
+  );
 }
