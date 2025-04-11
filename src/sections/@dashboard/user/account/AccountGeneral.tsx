@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Box, Grid, Card, Stack, Typography } from '@mui/material';
+import { Box, Grid, Card, Stack, Typography, MenuItem } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // auth
 import { useAuthContext } from '../../../../auth/useAuthContext';
@@ -20,40 +20,48 @@ import FormProvider, {
   RHFSelect,
   RHFTextField,
   RHFUploadAvatar,
+  RHFMultiCheckbox,
 } from '../../../../components/hook-form';
+import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getRoles } from 'src/apis/role.api';
+import { updateProfile, updateUser, uploadAvatar } from 'src/apis/user.api';
 
 type FormValuesProps = {
-  displayName: string;
-  email: string;
-  photoURL: CustomFile | string | null;
-  phoneNumber: string | null;
-  country: string | null;
-  address: string | null;
-  state: string | null;
-  city: string | null;
-  zipCode: string | null;
-  about: string | null;
-  isPublic: boolean;
+  photoURL?: CustomFile | string | null;
+  phone: string;
+  gender: string;
+  position: string;
+  birthday: string;
+  roles: number[];
+  name: string;
 };
 
 export default function AccountGeneral() {
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuthContext();
-  const UpdateUserSchema = Yup.object().shape({
-    displayName: Yup.string().required('Name is required'),
+
+  const { data: RoleData } = useQuery({
+    queryKey: ['roles'],
+    queryFn: () => getRoles({ page: '1' }),
   });
+
+  const UpdateUserSchema = Yup.object().shape({
+    phone: Yup.string().required('Phone is required'),
+    gender: Yup.string().required('Gender is required'),
+    position: Yup.string().required('Position is required'),
+    birthday: Yup.string().required('Birthday is required'),
+    name: Yup.string().required('Name is required'),
+  });
+
   const defaultValues = {
-    displayName: user?.displayName || '',
-    email: user?.email || '',
-    photoURL: user?.photoURL || '',
-    phoneNumber: user?.phoneNumber || '',
-    country: user?.country || '',
-    address: user?.address || '',
-    state: user?.state || '',
-    city: user?.city || '',
-    zipCode: user?.zipCode || '',
-    about: user?.about || '',
-    isPublic: user?.isPublic || false,
+    phone: user?.phone || '',
+    gender: user?.gender || '',
+    position: user?.position || '',
+    birthday: user?.birthday || '',
+    roles: user?.role || [],
+    photoURL: user?.avatar || '',
+    name: user?.name || '',
   };
 
   const methods = useForm<FormValuesProps>({
@@ -66,15 +74,6 @@ export default function AccountGeneral() {
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
-
-  const onSubmit = async (data: FormValuesProps) => {
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      enqueueSnackbar('Update success!');
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -91,6 +90,50 @@ export default function AccountGeneral() {
     [setValue]
   );
 
+  const handleUpdate = useMutation({
+    mutationFn: (data: FormValuesProps) => {
+      const newData = { ...data, roles: data.roles?.map((item: any) => item.id) };
+      delete newData.photoURL;
+      return updateProfile(newData);
+    },
+    onSuccess: () => {
+      enqueueSnackbar('Thông tin đã được cập nhập.', { variant: 'success' });
+    },
+    onError: (err) => enqueueSnackbar(err.message, { variant: 'error' }),
+  });
+
+  const handleUploadImage = useMutation({
+    mutationFn: (file: any) => {
+      const data = { upload_preset: 'ml_default', file };
+      return uploadAvatar(data);
+    },
+    onError: () => {
+      enqueueSnackbar('Có lỗi xảy ra ! Vui lòng thử lại.', { variant: 'error' });
+    },
+  });
+
+  const onSubmit = async (data: FormValuesProps) => {
+    try {
+      let photoURL = data.photoURL;
+
+      // Nếu là File (không phải string URL), thì upload
+      if (photoURL instanceof File) {
+        const uploadResult = await handleUploadImage.mutateAsync(photoURL);
+        photoURL = uploadResult.data.secure_url;
+      }
+
+      const newData = {
+        ...data,
+        avatar: photoURL,
+      };
+
+      handleUpdate.mutate(newData);
+    } catch (err) {
+      enqueueSnackbar('Có lỗi xảy ra khi upload ảnh.', { variant: 'error' });
+    }
+  };
+
+  console.log(user);
   return (
     <>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -117,13 +160,6 @@ export default function AccountGeneral() {
                   </Typography>
                 }
               />
-
-              <RHFSwitch
-                name="isPublic"
-                labelPlacement="start"
-                label="Public Profile"
-                sx={{ mt: 5 }}
-              />
             </Card>
           </Grid>
 
@@ -138,33 +174,26 @@ export default function AccountGeneral() {
                   sm: 'repeat(2, 1fr)',
                 }}
               >
-                <RHFTextField name="displayName" label="Name" />
-
-                <RHFTextField name="email" label="Email Address" />
-
-                <RHFTextField name="phoneNumber" label="Phone Number" />
-
-                <RHFTextField name="address" label="Address" />
-
-                <RHFSelect name="country" label="Country" placeholder="Country">
-                  <option value="" />
-                  {countries.map((option) => (
-                    <option key={option.code} value={option.label}>
-                      {option.label}
-                    </option>
-                  ))}
+                <RHFTextField name="name" label="Name" />
+                <RHFTextField name="phone" label="Phone" />
+                <RHFSelect name="gender" label="Gender" SelectProps={{ native: false }}>
+                  <MenuItem value="Nam">Nam</MenuItem>
+                  <MenuItem value="Nữ">Nữ</MenuItem>
                 </RHFSelect>
-
-                <RHFTextField name="state" label="State/Region" />
-
-                <RHFTextField name="city" label="City" />
-
-                <RHFTextField name="zipCode" label="Zip/Code" />
+                <RHFTextField name="position" label="Position" />
+                <RHFDatePicker name="birthday" label="Birthday" />
               </Box>
-
+              <Stack sx={{ mt: 3 }}>
+                {RoleData && user?.code === 'admin' && (
+                  <RHFMultiCheckbox
+                    name="roles"
+                    options={RoleData?.data.response[0].data.map((item: any) => {
+                      return { label: item.name, value: item.id };
+                    })}
+                  />
+                )}
+              </Stack>
               <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
-                <RHFTextField name="about" multiline rows={4} label="About" />
-
                 <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
                   Lưu thông tin
                 </LoadingButton>

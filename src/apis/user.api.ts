@@ -55,3 +55,11 @@ export const uploadAvatar = ({ file, upload_preset }: { file: any; upload_preset
     }
   );
 };
+
+export const updateProfile = (data: any) =>
+  http.put('/auth/profile', data, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${getStorage('accessToken')}`,
+    },
+  });
