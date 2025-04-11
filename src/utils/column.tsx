@@ -126,3 +126,86 @@ export const StorageTableColumns: GridColDef[] = [
     disableColumnMenu: true,
   },
 ];
+
+export const SupplierTableColumns: GridColDef[] = [
+  {
+    field: 'id',
+    headerName: 'ID',
+    width: 150,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'code',
+    headerName: 'CODE',
+    width: 150,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'name',
+    headerName: 'Name',
+    width: 200,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'phone',
+    headerName: 'Phone',
+    width: 150,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'email',
+    headerName: 'Email',
+    width: 200,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'address',
+    headerName: 'Address',
+    width: 200,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'region',
+    headerName: 'Region',
+    width: 150,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'branch',
+    headerName: 'Branch',
+    width: 150,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'status',
+    headerName: 'Status',
+    width: 200,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'note',
+    headerName: 'Note',
+    width: 300,
+    sortable: false,
+    disableColumnMenu: true,
+  },
+  {
+    field: 'created_by',
+    headerName: 'Created By',
+    width: 150,
+    sortable: false,
+    disableColumnMenu: true,
+    valueGetter: (params: any) => {
+      return params.name;
+    },
+  },
+];

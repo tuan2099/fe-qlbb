@@ -66,6 +66,11 @@ const navConfig = [
         path: PATH_DASHBOARD.warehouse,
         icon: ICONS.dashboard,
       },
+      {
+        title: 'supplier',
+        path: PATH_DASHBOARD.supplier,
+        icon: ICONS.dashboard,
+      },
     ],
   },
 ];
