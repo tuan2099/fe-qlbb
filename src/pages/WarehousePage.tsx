@@ -213,11 +213,11 @@ export default function WarehousePage() {
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="User List"
+          heading="Kho hàng"
           links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'User', href: PATH_DASHBOARD.user.root },
-            { name: 'List' },
+            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
+            { name: 'Kho', href: PATH_DASHBOARD.user.root },
+            { name: 'Danh sách kho' },
           ]}
           action={
             <Button

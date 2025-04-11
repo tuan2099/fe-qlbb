@@ -15,6 +15,10 @@ const ICONS = {
   analytics: icon('ic_analytics'),
   dashboard: icon('ic_dashboard'),
   menuItem: icon('ic_menu_item'),
+  warehouse: icon('ic_warehouse'),
+  supplier: icon('ic_supplier'),
+  shield: icon('ic_shield'),
+  form: icon('ic_form'),
 };
 
 const navConfig = [
@@ -49,27 +53,27 @@ const navConfig = [
   // MANAGEMENT
   // ----------------------------------------------------------------------
   {
-    subheader: 'management',
+    subheader: 'Quản lý kho',
     items: [
       {
-        title: 'user',
+        title: 'Người dùng',
         path: PATH_DASHBOARD.user.root,
         icon: ICONS.user,
       },
       {
-        title: 'role',
+        title: 'Quyền hạn',
         path: PATH_DASHBOARD.role,
-        icon: ICONS.dashboard,
+        icon: ICONS.shield,
       },
       {
-        title: 'warehouse',
+        title: 'Nhà kho',
         path: PATH_DASHBOARD.warehouse,
-        icon: ICONS.dashboard,
+        icon: ICONS.warehouse,
       },
       {
-        title: 'supplier',
+        title: 'Nhà cung cấp',
         path: PATH_DASHBOARD.supplier,
-        icon: ICONS.dashboard,
+        icon: ICONS.supplier,
       },
     ],
   },
