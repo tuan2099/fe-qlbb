@@ -98,26 +98,29 @@ export default function WarehousePage() {
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const [filterManager, setFilterManager] = useState('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page2 = searchParams.get('page') || '1';
 
   const {
     data: warehouseData,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['warehouses', page],
-    queryFn: () => getWarehouses({ page: String(page + 1) }),
+    queryKey: ['warehouses', page2],
+    queryFn: () => getWarehouses({ page: page2 }),
   });
 
-  // console.log(warehouseData);
+  console.log('warehouseData', warehouseData);
+
 
   useEffect(() => {
-    if (warehouseData?.data?.response?.[0]?.data) {
-      setTableData(warehouseData.data.response[0].data);
-      setFilterName('');
-      setFilterCode('all');
-      setFilterManager('all');
+    if (warehouseData?.data?.response?.[0]) {
+      const res = warehouseData.data.response[0];
+      setTableData(res.data); // Dữ liệu của trang hiện tại
+      setPage(res.current_page - 1); // Vì page trong useTable bắt đầu từ 0
     }
   }, [warehouseData]);
+
 
 
   const dataFiltered = applyFilter({
@@ -292,19 +295,16 @@ export default function WarehousePage() {
                 />
 
                 <TableBody>
-                  {dataFiltered
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <WarehouseTableRow
-                        key={row.id}
-                        row={row}
-                        selected={selected.includes(row.id)}
-                        onSelectRow={() => onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(Number(row.id))}
-                        onEditRow={() => handleEditRow(Number(row.id))}
-                      />
-                    ))}
-
+                  {tableData.map((row) => (
+                    <WarehouseTableRow
+                      key={row.id}
+                      row={row}
+                      selected={selected.includes(row.id)}
+                      onSelectRow={() => onSelectRow(row.id)}
+                      onDeleteRow={() => handleDeleteRow(Number(row.id))}
+                      onEditRow={() => handleEditRow(Number(row.id))}
+                    />
+                  ))}
                   <TableEmptyRows
                     height={denseHeight}
                     emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
@@ -316,15 +316,19 @@ export default function WarehousePage() {
             </Scrollbar>
           </TableContainer>
 
-          {/* <TablePaginationCustom
-            count={totalItems}
-            page={currentPage}
+          <TablePaginationCustom
+            count={warehouseData?.data?.response?.[0]?.total || 0}
+            page={page}
             rowsPerPage={rowsPerPage}
-            onPageChange={(event, newPage) => setPage(newPage)}
-            onRowsPerPageChange={() => { }}
+            onPageChange={(event, newPage) => {
+              setPage(newPage);
+              setSearchParams({ page: (newPage + 1).toString() });
+            }}
+            onRowsPerPageChange={onChangeRowsPerPage}
             dense={dense}
             onChangeDense={onChangeDense}
-          /> */}
+          />
+
         </Card>
       </Container>
 
