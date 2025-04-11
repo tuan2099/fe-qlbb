@@ -102,7 +102,7 @@ export default function WarehouseTableRow({
                     sx={{ color: 'error.main' }}
                 >
                     <Iconify icon="eva:trash-2-outline" />
-                    Delete
+                    Xoá
                 </MenuItem>
 
                 <MenuItem
@@ -112,7 +112,7 @@ export default function WarehouseTableRow({
                     }}
                 >
                     <Iconify icon="eva:edit-fill" />
-                    Edit
+                    Chỉnh sửa
                 </MenuItem>
             </MenuPopover>
 
@@ -123,7 +123,7 @@ export default function WarehouseTableRow({
                 content="Are you sure want to delete?"
                 action={
                     <Button variant="contained" color="error" onClick={onDeleteRow}>
-                        Delete
+                        Xoá
                     </Button>
                 }
             />

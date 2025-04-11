@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
-import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'notistack';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // @mui
@@ -51,7 +49,6 @@ const TABLE_HEAD = [
   { id: 'name', label: 'Tên Kho', align: 'left' },
   { id: 'note', label: 'Ghi chú', align: 'left' },
   { id: 'manager_by', label: 'Người quản lý', align: 'left' },
-  // { id: '' },
 ];
 
 const ROLE_OPTIONS = [
@@ -116,12 +113,10 @@ export default function WarehousePage() {
   useEffect(() => {
     if (warehouseData?.data?.response?.[0]) {
       const res = warehouseData.data.response[0];
-      setTableData(res.data); // Dữ liệu của trang hiện tại
-      setPage(res.current_page - 1); // Vì page trong useTable bắt đầu từ 0
+      setTableData(res.data);
+      setPage(res.current_page - 1);
     }
   }, [warehouseData]);
-
-
 
   const dataFiltered = applyFilter({
     inputData: tableData,

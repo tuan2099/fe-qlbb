@@ -86,16 +86,16 @@ const SupplierPage = () => {
   return (
     <>
       <Helmet>
-        <title> Supplier Page | Minimal UI</title>
+        <title> Nhà cung cấp | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          Supplier Page
+          Nhà cung cấp
         </Typography>
 
         <Button sx={{ mb: 2 }} onClick={() => navigate('/dashboard/supplier/add')}>
-          Create supplier
+          Tạo mới nhà cung cấp
         </Button>
 
         <DataTable

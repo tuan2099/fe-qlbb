@@ -65,8 +65,7 @@ export default function AccountChangePassword() {
               label="New Password"
               helperText={
                 <Stack component="span" direction="row" alignItems="center">
-                  <Iconify icon="eva:info-fill" width={16} sx={{ mr: 0.5 }} /> Password must be
-                  minimum 6+
+                  <Iconify icon="eva:info-fill" width={16} sx={{ mr: 0.5 }} /> Mật khẩu tối thiểu 6 kí tự
                 </Stack>
               }
             />
@@ -74,7 +73,7 @@ export default function AccountChangePassword() {
             <RHFTextField name="confirmNewPassword" type="password" label="Confirm New Password" />
 
             <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-              Save Changes
+              Lưu thay đổi
             </LoadingButton>
           </Stack>
         </Card>

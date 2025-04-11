@@ -94,7 +94,7 @@ export default function WarehouseTableToolbar({
                     onClick={onResetFilter}
                     startIcon={<Iconify icon="eva:trash-2-outline" />}
                 >
-                    Clear
+                    Xoá bộ lọc
                 </Button>
             )}
         </Stack>
