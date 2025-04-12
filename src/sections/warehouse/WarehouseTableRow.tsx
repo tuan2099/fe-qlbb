@@ -78,7 +78,7 @@ export default function WarehouseTableRow({
                 <TableCell align="left">{note}</TableCell>
 
                 <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-                    {manager_by.name}
+                    {manager_by?.name || ''}
                 </TableCell>
 
                 <TableCell align="right">

@@ -20,7 +20,8 @@ import {
   AddWarehouse,
   SupplierPage,
   AddSupplier,
-  UserAccountPage
+  UserAccountPage,
+  WarehouseDispatchPage
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -86,6 +87,12 @@ export default function Router() {
             { path: 'update/:id', element: <AddSupplier /> },
           ],
         },
+        {
+          path: 'warehouse-dispatch',
+          children: [
+            { element: <WarehouseDispatchPage replace />, index: true },
+          ]
+        }
       ],
     },
     {
