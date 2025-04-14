@@ -31,7 +31,6 @@ type FormValuesProps = {
   photoURL?: CustomFile | string | null;
   phone: string;
   gender: string;
-  position: string;
   birthday: string;
   roles: number[];
   name: string;
@@ -49,7 +48,7 @@ export default function AccountGeneral() {
   const UpdateUserSchema = Yup.object().shape({
     phone: Yup.string().required('Phone is required'),
     gender: Yup.string().required('Gender is required'),
-    position: Yup.string().required('Position is required'),
+
     birthday: Yup.string().required('Birthday is required'),
     name: Yup.string().required('Name is required'),
   });
@@ -57,7 +56,7 @@ export default function AccountGeneral() {
   const defaultValues = {
     phone: user?.phone || '',
     gender: user?.gender || '',
-    position: user?.position || '',
+
     birthday: user?.birthday || '',
     roles: user?.role || [],
     photoURL: user?.avatar || '',
@@ -180,19 +179,10 @@ export default function AccountGeneral() {
                   <MenuItem value="Nam">Nam</MenuItem>
                   <MenuItem value="Nữ">Nữ</MenuItem>
                 </RHFSelect>
-                <RHFTextField name="position" label="Position" />
+
                 <RHFDatePicker name="birthday" label="Birthday" />
               </Box>
-              <Stack sx={{ mt: 3 }}>
-                {RoleData && user?.code === 'admin' && (
-                  <RHFMultiCheckbox
-                    name="roles"
-                    options={RoleData?.data.response[0].data.map((item: any) => {
-                      return { label: item.name, value: item.id };
-                    })}
-                  />
-                )}
-              </Stack>
+
               <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
                 <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
                   Lưu thông tin
