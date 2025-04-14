@@ -79,7 +79,12 @@ const navConfig = [
         title: 'Xuất kho',
         path: PATH_DASHBOARD.warehosueDispatch,
         icon: ICONS.ecommerce,
-      }
+      },
+      {
+        title: 'Biển bảng',
+        path: PATH_DASHBOARD.signboard,
+        icon: ICONS.supplier,
+      },
     ],
   },
 ];

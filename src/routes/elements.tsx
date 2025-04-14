@@ -5,11 +5,11 @@ import LoadingScreen from '../components/loading-screen';
 // ----------------------------------------------------------------------
 
 const Loadable = (Component: ElementType) => (props: any) =>
-(
-  <Suspense fallback={<LoadingScreen />}>
-    <Component {...props} />
-  </Suspense>
-);
+  (
+    <Suspense fallback={<LoadingScreen />}>
+      <Component {...props} />
+    </Suspense>
+  );
 
 // ----------------------------------------------------------------------
 
@@ -24,9 +24,13 @@ export const WarehousePage = Loadable(lazy(() => import('../pages/WarehousePage'
 export const AddWarehouse = Loadable(lazy(() => import('../pages/AddWarehouse')));
 export const SupplierPage = Loadable(lazy(() => import('../pages/SupplierPage')));
 export const AddSupplier = Loadable(lazy(() => import('../pages/AddSupplier')));
+export const SignBoard = Loadable(lazy(() => import('../pages/SignBoard')));
+export const AddSignBoard = Loadable(lazy(() => import('../pages/AddSignBoard')));
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
 
 // Dashboard User
 export const UserAccountPage = Loadable(lazy(() => import('../pages/dasshboards/UserAccountPage')));
-export const WarehouseDispatchPage = Loadable(lazy(() => import('../pages/dasshboards/WarehousedispatchPage')));
+export const WarehouseDispatchPage = Loadable(
+  lazy(() => import('../pages/dasshboards/WarehousedispatchPage'))
+);

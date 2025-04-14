@@ -21,7 +21,9 @@ import {
   SupplierPage,
   AddSupplier,
   UserAccountPage,
-  WarehouseDispatchPage
+  WarehouseDispatchPage,
+  SignBoard,
+  AddSignBoard,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -88,11 +90,17 @@ export default function Router() {
           ],
         },
         {
-          path: 'warehouse-dispatch',
+          path: 'signboard',
           children: [
-            { element: <WarehouseDispatchPage replace />, index: true },
-          ]
-        }
+            { element: <SignBoard replace />, index: true },
+            { path: 'add', element: <AddSignBoard /> },
+            { path: 'update/:id', element: <AddSignBoard /> },
+          ],
+        },
+        {
+          path: 'warehouse-dispatch',
+          children: [{ element: <WarehouseDispatchPage replace />, index: true }],
+        },
       ],
     },
     {
