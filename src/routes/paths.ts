@@ -25,4 +25,5 @@ export const PATH_DASHBOARD = {
   warehouse: path(ROOTS_DASHBOARD, '/warehouse'),
   supplier: path(ROOTS_DASHBOARD, '/supplier'),
   warehosueDispatch: path(ROOTS_DASHBOARD, '/warehouse-dispatch'),
+  signboard: path(ROOTS_DASHBOARD, '/signboard'),
 };
