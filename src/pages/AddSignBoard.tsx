@@ -1,18 +1,16 @@
 import * as Yup from 'yup';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Box, Grid, Card, Stack, Typography, MenuItem, Container } from '@mui/material';
+import { Box, Grid, Card, Stack, Typography, Container } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-
 import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getRoles } from 'src/apis/role.api';
-import { updateProfile, updateUser, uploadAvatar } from 'src/apis/user.api';
+import { uploadAvatar } from 'src/apis/user.api';
 import { useSnackbar } from 'notistack';
 import { CustomFile } from 'src/components/upload';
 import FormProvider, { RHFSelect, RHFTextField, RHFUploadAvatar } from 'src/components/hook-form';
@@ -42,35 +40,18 @@ type FormValuesProps = {
   note?: string;
 };
 
-// name: signBoardData?.data.response[0].name || '',
-// type: signBoardData?.data.response[0].type || '',
-// material: signBoardData?.data.response[0].material || '',
-// size: signBoardData?.data.response[0].size || '',
-// unit: signBoardData?.data.response[0].unit || '',
-// supplier_id: signBoardData?.data.response[0].supplier_id || '',
-// status: signBoardData?.data.response[0].status || '',
-// import_price: signBoardData?.data.response[0].import_price || '',
-// selling_price: signBoardData?.data.response[0].selling_price || '',
-// expiry_date: signBoardData?.data.response[0].expiry_date || '',
-// specification: signBoardData?.data.response[0].specification || '',
-// min_quantity: signBoardData?.data.response[0].min_quantity || 0,
-// max_quantity: signBoardData?.data.response[0].max_quantity || 0,
-// note: signBoardData?.data.response[0].note || '',
-// image: signBoardData?.data.response[0].image || '',
-
 export default function AddSignBoard() {
   const { enqueueSnackbar } = useSnackbar();
   const { themeStretch } = useSettingsContext();
   const { id } = useParams();
   const isAddMode = !Boolean(id);
+  const [isUpdate, setIsUpdate] = useState(false);
 
   const { data: signBoardData, isLoading } = useQuery({
     queryKey: ['signboard', id],
     queryFn: () => getSignboard(id),
     enabled: Boolean(id),
   });
-
-  console.log(signBoardData);
 
   const UpdateUserSchema = Yup.object().shape({
     name: Yup.string().required('name is required'),
@@ -115,6 +96,30 @@ export default function AddSignBoard() {
     defaultValues,
   });
 
+  useEffect(() => {
+    if (signBoardData) {
+      const signboard = signBoardData.data.response[0];
+
+      methods.reset({
+        name: signboard.name || '',
+        type: signboard.type || '',
+        material: signboard.material || '',
+        size: signboard.size || '',
+        unit: signboard.unit || '',
+        supplier_id: signboard.supplier_id || '',
+        status: signboard.status || '',
+        import_price: signboard.import_price || '',
+        selling_price: signboard.selling_price || '',
+        expiry_date: signboard.expiry_date || '',
+        specification: signboard.specification || '',
+        min_quantity: signboard.min_quantity || 0,
+        max_quantity: signboard.max_quantity || 0,
+        note: signboard.note || '',
+        image: signboard.image || '',
+      });
+    }
+  }, [signBoardData, methods]);
+
   const {
     setValue,
     handleSubmit,
@@ -150,7 +155,6 @@ export default function AddSignBoard() {
       enqueueSnackbar('Thông tin đã được cập nhập.', { variant: 'success' });
     },
     onError: (err) => {
-      console.log(err);
       enqueueSnackbar(err.message, { variant: 'error' });
     },
   });
@@ -211,6 +215,7 @@ export default function AddSignBoard() {
                       name="image"
                       maxSize={3145728}
                       onDrop={handleDrop}
+                      editable={isAddMode || isUpdate}
                       helperText={
                         <Typography
                           variant="caption"
@@ -241,27 +246,87 @@ export default function AddSignBoard() {
                         sm: 'repeat(2, 1fr)',
                       }}
                     >
-                      <RHFTextField name="name" label="Tên biển bảng" />
-                      <RHFTextField name="type" label="Loại biển bảng" />
-                      <RHFTextField name="material" label="Chất liệu" />
-                      <RHFTextField name="size" label="Kích thước" />
-                      <RHFTextField name="unit" label="Đơn vị tính" />
-                      <RHFTextField name="supplier_id" label="ID nhà cung cấp" />
-                      <RHFTextField name="import_price" label="Giá nhập" />
-                      <RHFTextField name="selling_price" label="Giá bán" />
-                      <RHFTextField name="status" label="Trạng thái" />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="name"
+                        label="Tên biển bảng"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="type"
+                        label="Loại biển bảng"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="material"
+                        label="Chất liệu"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="size"
+                        label="Kích thước"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="unit"
+                        label="Đơn vị tính"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="supplier_id"
+                        label="ID nhà cung cấp"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="import_price"
+                        label="Giá nhập"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="selling_price"
+                        label="Giá bán"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="status"
+                        label="Trạng thái"
+                      />
 
-                      <RHFTextField name="specification" label="Quy cách sản phẩm" />
-                      <RHFTextField name="min_quantity" label="Số lượng tồn kho tối thiểu" />
-                      <RHFTextField name="max_quantity" label="Số lượng tồn kho tối đa" />
-                      <RHFTextField name="note" label="Ghi chú" />
-                      <RHFDatePicker name="expiry_date" label="Hạn sử dụng" />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="specification"
+                        label="Quy cách sản phẩm"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="min_quantity"
+                        label="Số lượng tồn kho tối thiểu"
+                      />
+                      <RHFTextField
+                        editable={isAddMode || isUpdate}
+                        name="max_quantity"
+                        label="Số lượng tồn kho tối đa"
+                      />
+                      <RHFTextField editable={isAddMode || isUpdate} name="note" label="Ghi chú" />
+                      <RHFDatePicker
+                        name="expiry_date"
+                        label="Hạn sử dụng"
+                        editable={isAddMode || isUpdate}
+                      />
                     </Box>
 
                     <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
-                      <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                        Lưu thông tin
-                      </LoadingButton>
+                      {!isAddMode && !isUpdate && (
+                        <LoadingButton onClick={() => setIsUpdate(true)} variant="contained">
+                          Cập nhập
+                        </LoadingButton>
+                      )}
+
+                      {(isAddMode || isUpdate) && (
+                        <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+                          Lưu thông tin
+                        </LoadingButton>
+                      )}
                     </Stack>
                   </Card>
                 </Grid>
