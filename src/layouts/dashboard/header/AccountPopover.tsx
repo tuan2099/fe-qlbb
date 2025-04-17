@@ -12,29 +12,14 @@ import { CustomAvatar } from '../../../components/custom-avatar';
 import { useSnackbar } from '../../../components/snackbar';
 import MenuPopover from '../../../components/menu-popover';
 import { IconButtonAnimate } from '../../../components/animate';
-
+// locales
+import { useLocales } from '../../../locales';
 // ----------------------------------------------------------------------
 
-const OPTIONS = [
-  {
-    label: 'Home',
-    linkTo: '/',
-  },
-  {
-    label: 'Profile',
-    linkTo: '/',
-  },
-  {
-    label: 'Settings',
-    linkTo: '/dashboard/user/account',
-  },
-];
-
-// ----------------------------------------------------------------------
 
 export default function AccountPopover() {
   const navigate = useNavigate();
-
+  const { translate } = useLocales();
   const { user, logout } = useAuthContext();
 
   const { enqueueSnackbar } = useSnackbar();
@@ -64,6 +49,23 @@ export default function AccountPopover() {
     handleClosePopover();
     navigate(path);
   };
+
+  const OPTIONS = [
+    {
+      label: `${translate('Home')}`,
+      linkTo: '/',
+    },
+    {
+      label: `${translate('Profile')}`,
+      linkTo: '/',
+    },
+    {
+      label: `${translate('Account')}`,
+      linkTo: '/dashboard/user/account',
+    },
+  ];
+
+  // ----------------------------------------------------------------------
 
   return (
     <>
@@ -111,7 +113,7 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
-          Logout
+          {translate('Logout')}
         </MenuItem>
       </MenuPopover>
     </>

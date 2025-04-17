@@ -56,6 +56,10 @@ const vn = {
   other_cases: `Trường hợp khác`,
   item_by_roles: `mục theo vai trò`,
   only_admin_can_see_this_item: `Chỉ có quản trị viên mới có thể nhìn thấy mục này`,
+  Logout: `Đăng xuất`,
+  Home: `Trang chủ`,
+  Profile: `Hồ sơ người dùng`,
+  Account: `Cài đặt tài khoản`,
 };
 
 export default vn;
