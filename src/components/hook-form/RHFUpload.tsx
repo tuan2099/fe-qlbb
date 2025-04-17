@@ -15,11 +15,12 @@ interface Props extends Omit<UploadProps, 'file'> {
   maxSize?: number;
   onDrop: (acceptedFiles: File[]) => void;
   helperText?: React.ReactNode;
+  editable?: boolean;
 }
 
 // ----------------------------------------------------------------------
 
-export default function RHFUploadAvatar({ name, ...other }: Props) {
+export default function RHFUploadAvatar({ name, editable, ...other }: Props) {
   const { control } = useFormContext();
 
   return (
@@ -32,6 +33,7 @@ export default function RHFUploadAvatar({ name, ...other }: Props) {
         return (
           <div>
             <UploadAvatar
+              disabled={!editable}
               accept={{
                 'image/*': [],
               }}
