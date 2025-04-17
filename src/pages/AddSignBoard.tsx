@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 // form
@@ -21,6 +21,8 @@ import { useSettingsContext } from 'src/components/settings';
 import { useParams } from 'react-router';
 import { addSignboard, getSignboard, updateSignboard } from 'src/apis/signboard.api';
 import LoadingScreen from 'src/components/loading-screen';
+import { AuthContext } from 'src/auth/JwtContext';
+import { usePermission } from 'src/hooks/usePermisson';
 
 type FormValuesProps = {
   image?: CustomFile | string | null;
@@ -46,6 +48,10 @@ export default function AddSignBoard() {
   const { id } = useParams();
   const isAddMode = !Boolean(id);
   const [isUpdate, setIsUpdate] = useState(false);
+
+  const context = useContext(AuthContext);
+
+  const { hasPermission } = usePermission(context?.userRole, context?.permissions || []);
 
   const { data: signBoardData, isLoading } = useQuery({
     queryKey: ['signboard', id],
@@ -199,6 +205,7 @@ export default function AddSignBoard() {
           </Helmet>
 
           <Container maxWidth={themeStretch ? false : 'xl'}>
+            {hasPermission('signboard_edit') && <p>Bạn có quyền edit </p>}
             <CustomBreadcrumbs
               heading="Tùy chỉnh sản phẩm"
               links={[

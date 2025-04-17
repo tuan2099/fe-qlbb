@@ -10,7 +10,7 @@ type Props = TextFieldProps & {
   editable?: boolean;
 };
 
-export default function RHFTextField({ name, editable, ...other }: Props) {
+export default function RHFTextField({ name, editable = true, ...other }: Props) {
   const { control } = useFormContext();
 
   return (
@@ -20,7 +20,7 @@ export default function RHFTextField({ name, editable, ...other }: Props) {
       render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
-          disabled={editable || false}
+          disabled={!editable}
           fullWidth
           value={typeof field.value === 'number' && field.value === 0 ? '' : field.value}
           error={!!error}

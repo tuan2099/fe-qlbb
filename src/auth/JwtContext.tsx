@@ -1,15 +1,7 @@
 import { createContext, useEffect, useReducer, useCallback } from 'react';
-// utils
 import axios from '../utils/axios';
-//
 import { isValidToken, setSession } from './utils';
 import { ActionMapType, AuthStateType, AuthUserType, JWTContextType } from './types';
-
-// ----------------------------------------------------------------------
-
-// NOTE:
-// We only build demo at basic level.
-// Customer will need to do some extra handling yourself if you want to extend the logic and other features...
 
 // ----------------------------------------------------------------------
 
@@ -24,6 +16,8 @@ type Payload = {
   [Types.INITIAL]: {
     isAuthenticated: boolean;
     user: AuthUserType;
+    userRole: any;
+    permissions: any[];
   };
   [Types.LOGIN]: {
     user: AuthUserType;
@@ -42,39 +36,43 @@ const initialState: AuthStateType = {
   isInitialized: false,
   isAuthenticated: false,
   user: null,
+  userRole: null,
+  permissions: [],
 };
 
 const reducer = (state: AuthStateType, action: ActionsType) => {
-  if (action.type === Types.INITIAL) {
-    return {
-      isInitialized: true,
-      isAuthenticated: action.payload.isAuthenticated,
-      user: action.payload.user,
-    };
+  switch (action.type) {
+    case Types.INITIAL:
+      return {
+        isInitialized: true,
+        isAuthenticated: action.payload.isAuthenticated,
+        user: action.payload.user,
+        userRole: action.payload.userRole,
+        permissions: action.payload.permissions,
+      };
+    case Types.LOGIN:
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload.user,
+      };
+    case Types.REGISTER:
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload.user,
+      };
+    case Types.LOGOUT:
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: null,
+        userRole: null,
+        permissions: [],
+      };
+    default:
+      return state;
   }
-  if (action.type === Types.LOGIN) {
-    return {
-      ...state,
-      isAuthenticated: true,
-      user: action.payload.user,
-    };
-  }
-  if (action.type === Types.REGISTER) {
-    return {
-      ...state,
-      isAuthenticated: true,
-      user: action.payload.user,
-    };
-  }
-  if (action.type === Types.LOGOUT) {
-    return {
-      ...state,
-      isAuthenticated: false,
-      user: null,
-    };
-  }
-
-  return state;
 };
 
 // ----------------------------------------------------------------------
@@ -90,6 +88,40 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const fetchAllPermissions = async (): Promise<any[]> => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return [];
+    let allData: any[] = [];
+    let page = 1;
+    let hasNext = true;
+
+    while (hasNext) {
+      const response = await axios.get('/permission', {
+        params: {
+          page,
+          pageSize: 10,
+        },
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log(response);
+
+      const data = response.data?.response.data || [];
+      allData = [...allData, ...data];
+
+      if (data.length < 10) {
+        hasNext = false;
+      } else {
+        page += 1;
+      }
+    }
+
+    return allData;
+  };
+
   const initialize = useCallback(async () => {
     try {
       const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
@@ -98,15 +130,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (accessToken && isValidToken(accessToken)) {
         setSession(accessToken, expiresTime);
 
-        const profile = await axios.get('/auth/profile');
+        const profileRes = await axios.get('/auth/profile');
+        const user = profileRes.data.response[0];
+        console.log(user.roles[0].id);
 
-        const user = profile.data.response[0];
+        const [userRoleRes, permissions] = await Promise.all([
+          axios.get(`/role/${user.roles[0].id}`),
+          fetchAllPermissions(),
+        ]);
+
+        console.log('userRoleRes', userRoleRes);
+        console.log('permissions', permissions);
 
         dispatch({
           type: Types.INITIAL,
           payload: {
             isAuthenticated: true,
             user,
+            userRole: userRoleRes.data.response[0].permissions,
+            permissions,
           },
         });
       } else {
@@ -115,6 +157,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           payload: {
             isAuthenticated: false,
             user: null,
+            userRole: null,
+            permissions: [],
           },
         });
       }
@@ -125,6 +169,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         payload: {
           isAuthenticated: false,
           user: null,
+          userRole: null,
+          permissions: [],
         },
       });
     }
