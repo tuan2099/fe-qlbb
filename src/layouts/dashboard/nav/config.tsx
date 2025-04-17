@@ -18,7 +18,8 @@ const ICONS = {
   warehouse: icon('ic_warehouse'),
   supplier: icon('ic_supplier'),
   shield: icon('ic_shield'),
-  form: icon('ic_form'),
+  role: icon('ic_role'),
+  product: icon('ic_product'),
 };
 
 const navConfig = [
@@ -44,7 +45,7 @@ const navConfig = [
       },
       {
         title: 'Thống kê',
-        path: PATH_DASHBOARD.user.root,
+        path: '#',
         icon: ICONS.analytics,
       },
     ],
@@ -63,7 +64,7 @@ const navConfig = [
       {
         title: 'Quyền hạn',
         path: PATH_DASHBOARD.role,
-        icon: ICONS.shield,
+        icon: ICONS.role,
       },
       {
         title: 'Nhà kho',
@@ -83,7 +84,7 @@ const navConfig = [
       {
         title: 'Biển bảng',
         path: PATH_DASHBOARD.signboard,
-        icon: ICONS.supplier,
+        icon: ICONS.product,
       },
     ],
   },

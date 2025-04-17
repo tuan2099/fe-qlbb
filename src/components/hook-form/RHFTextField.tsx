@@ -20,7 +20,7 @@ export default function RHFTextField({ name, editable, ...other }: Props) {
       render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
-          disabled={!editable}
+          disabled={editable || false}
           fullWidth
           value={typeof field.value === 'number' && field.value === 0 ? '' : field.value}
           error={!!error}

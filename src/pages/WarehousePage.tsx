@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // @mui
 import {
   Tab,
@@ -37,6 +36,8 @@ import {
 } from 'src/components/table';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
+import CustomBreadcrumbs from '../components/custom-breadcrumbs';
+
 // utils
 import { StorageTableColumns } from 'src/utils/column';
 // sections
@@ -106,9 +107,6 @@ export default function WarehousePage() {
     queryKey: ['warehouses', page2],
     queryFn: () => getWarehouses({ page: page2 }),
   });
-
-  console.log('warehouseData', warehouseData);
-
 
   useEffect(() => {
     if (warehouseData?.data?.response?.[0]) {
