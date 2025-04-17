@@ -246,8 +246,7 @@ export default function WarehousedispatchPage() {
                     ]}
                     action={
                         <Button
-                            // to={PATH_DASHBOARD.invoice.new}
-                            to=""
+                            to="/dashboard/warehouse-dispatch/add"
                             component={RouterLink}
                             variant="contained"
                             startIcon={<Iconify icon="eva:plus-fill" />}

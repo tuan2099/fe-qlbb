@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 // form
 import { useFormContext, Controller } from 'react-hook-form';
 // @mui
@@ -62,7 +63,7 @@ export default function InvoiceNewEditStatusDate() {
         render={({ field, fieldState: { error } }) => (
           <DatePicker
             label="Date create"
-            value={field.value}
+            value={field.value ? dayjs(field.value) : null}
             onChange={(newValue) => {
               field.onChange(newValue);
             }}
