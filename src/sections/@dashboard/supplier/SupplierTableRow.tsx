@@ -14,10 +14,10 @@ import {
 // @types
 // import { IUserAccountGeneral } from '../../../../@types/user';
 // components
-import Label from '../../components/label';
-import Iconify from '../../components/iconify';
-import MenuPopover from '../../components/menu-popover';
-import ConfirmDialog from '../../components/confirm-dialog';
+import Label from '../../../components/label';
+import Iconify from '../../../components/iconify';
+import MenuPopover from '../../../components/menu-popover';
+import ConfirmDialog from '../../../components/confirm-dialog';
 
 // ----------------------------------------------------------------------
 

@@ -13,10 +13,10 @@ export function usePermission(userPermissions: any[], allPermissions: any[]) {
       .filter((a) => userPermissions.some((b) => b.id === a.id))
       .map((item) => item.code);
   }, [userPermissions, allPermissions]);
-  console.log(userPermissionCodes);
+  // console.log(userPermissionCodes);
 
-  console.log(userPermissions);
-  console.log(allPermissions);
+  // console.log(userPermissions);
+  // console.log(allPermissions);
 
   // Hàm kiểm tra user có quyền cụ thể không
   const hasPermission = (code: string) => userPermissionCodes.includes(code);

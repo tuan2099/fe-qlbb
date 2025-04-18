@@ -1,7 +1,7 @@
 // @mui
 import { Stack, InputAdornment, TextField, MenuItem, Button } from '@mui/material';
 // components
-import Iconify from '../../components/iconify';
+import Iconify from '../../../../components/iconify';
 
 // ----------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ type Props = {
     onFilterRole: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export default function WarehouseTableToolbar({
+export default function UserTableToolbar({
     isFiltered,
     filterName,
     filterRole,

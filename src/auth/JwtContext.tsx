@@ -92,14 +92,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const token = localStorage.getItem('accessToken');
     if (!token) return [];
     let allData: any[] = [];
-    let page = 1;
     let hasNext = true;
-
+    let page = '';
     while (hasNext) {
       const response = await axios.get('/permission', {
         params: {
           page,
-          pageSize: 10,
+          limit: 100,
         },
 
         headers: {
@@ -107,15 +106,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         },
       });
 
-      console.log(response);
+      // console.log(response);
 
       const data = response.data?.response.data || [];
       allData = [...allData, ...data];
-
-      if (data.length < 10) {
+      // console.log('allData', allData);
+      if (data.length < 100) {
         hasNext = false;
       } else {
-        page += 1;
       }
     }
 
@@ -139,8 +137,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           fetchAllPermissions(),
         ]);
 
-        console.log('userRoleRes', userRoleRes);
-        console.log('permissions', permissions);
+        // console.log('userRoleRes', userRoleRes);
+        // console.log('permissions', permissions);
 
         dispatch({
           type: Types.INITIAL,
@@ -232,9 +230,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         ...state,
         method: 'jwt',
         login,
-        loginWithGoogle: () => {},
-        loginWithGithub: () => {},
-        loginWithTwitter: () => {},
+        loginWithGoogle: () => { },
+        loginWithGithub: () => { },
+        loginWithTwitter: () => { },
         logout,
         register,
       }}

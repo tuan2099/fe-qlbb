@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
@@ -41,8 +41,10 @@ import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 // utils
 import { StorageTableColumns } from 'src/utils/column';
 // sections
-import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/warehouse';
+import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
 import { IWarehouse } from 'src/types/warehosue.type';
+import { AuthContext } from 'src/auth/JwtContext';
+import { usePermission } from 'src/hooks/usePermisson';
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -94,6 +96,8 @@ export default function WarehousePage() {
   const [filterCode, setFilterCode] = useState('all');
 
   const [openConfirm, setOpenConfirm] = useState(false);
+  const context = useContext(AuthContext)
+  const { hasPermission } = usePermission(context?.userRole, context?.permissions || [])
 
   const [filterManager, setFilterManager] = useState('all');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -213,14 +217,17 @@ export default function WarehousePage() {
             { name: 'Danh sách kho' },
           ]}
           action={
-            <Button
-              to="/dashboard/warehouse/add"
-              component={RouterLink}
-              variant="contained"
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              Tạo kho mới
-            </Button>
+            <>
+              {hasPermission('storage_create') &&
+                <Button
+                  to="/dashboard/warehouse/add"
+                  component={RouterLink}
+                  variant="contained"
+                  startIcon={<Iconify icon="eva:plus-fill" />}
+                >
+                  Tạo kho mới
+                </Button>}
+            </>
           }
         />
 

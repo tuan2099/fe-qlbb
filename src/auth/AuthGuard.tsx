@@ -14,7 +14,7 @@ type AuthGuardProps = {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const { isAuthenticated, isInitialized } = useAuthContext();
-  console.log(isAuthenticated);
+  // console.log(isAuthenticated);
 
   const { pathname } = useLocation();
 

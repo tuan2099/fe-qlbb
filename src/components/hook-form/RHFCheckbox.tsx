@@ -51,7 +51,7 @@ export function RHFMultiCheckbox({ name, options, ...other }: RHFMultiCheckboxPr
         return (
           <FormGroup>
             {options.map((option) => {
-              console.log(field.value?.some((item: any) => item.id == option.value));
+              // console.log(field.value?.some((item: any) => item.id == option.value));
               return (
                 <FormControlLabel
                   key={option.value}

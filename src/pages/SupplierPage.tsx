@@ -40,7 +40,7 @@ import Scrollbar from '../components/scrollbar';
 // type 
 import { ISupplier } from 'src/types/supplier.type';
 // sections
-import { SupplierTableRow, SupplierTableToolbar } from '../sections/supplier';
+import { SupplierTableRow, SupplierTableToolbar } from '../sections/@dashboard/supplier';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
 // ----------------------------------------------------------------------

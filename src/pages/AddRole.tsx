@@ -39,7 +39,7 @@ const AddRole = () => {
 
   const permisson = useQuery({
     queryKey: ['permission'],
-    queryFn: () => getPermisson({ page: '1' }),
+    queryFn: () => getPermisson({ page: '' }),
   });
 
   const { data: RoleData } = useQuery({
