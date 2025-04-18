@@ -230,9 +230,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         ...state,
         method: 'jwt',
         login,
-        loginWithGoogle: () => { },
-        loginWithGithub: () => { },
-        loginWithTwitter: () => { },
+        loginWithGoogle: () => {},
+        loginWithGithub: () => {},
+        loginWithTwitter: () => {},
         logout,
         register,
       }}

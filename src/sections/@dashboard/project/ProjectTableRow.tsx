@@ -1,8 +1,7 @@
 import { useState, useContext } from 'react';
-// @mui
+
 import {
   Stack,
-  Avatar,
   Button,
   Checkbox,
   TableRow,
@@ -11,10 +10,7 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-// @types
-// import { IUserAccountGeneral } from '../../../../@types/user';
-// components
-import Label from '../../../components/label';
+
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
@@ -30,7 +26,7 @@ type Props = {
   onDeleteRow: VoidFunction;
 };
 
-export default function SignboardTableRow({
+export default function ProjectTableRow({
   row,
   selected,
   onEditRow,
@@ -68,22 +64,19 @@ export default function SignboardTableRow({
 
         <TableCell>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <Avatar alt={row.name} src={row.image} />
-
             <Typography variant="subtitle2" noWrap>
               {row.name}
             </Typography>
           </Stack>
         </TableCell>
 
-        <TableCell align="left">{row.type}</TableCell>
-        <TableCell align="left">{row.material}</TableCell>
+        <TableCell align="left">{row.address}</TableCell>
+        <TableCell align="left">{row.director}</TableCell>
+        <TableCell align="left">{row.project_type}</TableCell>
+        <TableCell align="left">{row.region}</TableCell>
+        <TableCell align="left">{row.branch}</TableCell>
         <TableCell align="left">{row.status}</TableCell>
-        <TableCell align="left">{row.import_price}</TableCell>
-        <TableCell align="left">{row.selling_price}</TableCell>
-        <TableCell align="left">{row.expiry_date}</TableCell>
-        <TableCell align="left">{row.min_quantity}</TableCell>
-        <TableCell align="left">{row.max_quantity}</TableCell>
+        <TableCell align="left">{row.contact_person}</TableCell>
         <TableCell align="right">
           <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
             <Iconify icon="eva:more-vertical-fill" />
@@ -97,7 +90,7 @@ export default function SignboardTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        {hasPermission('storage_delete') && (
+        {hasPermission('project_delete') && (
           <MenuItem
             onClick={() => {
               handleOpenConfirm();
@@ -109,17 +102,15 @@ export default function SignboardTableRow({
             Xoá
           </MenuItem>
         )}
-        {hasPermission('storage_update') && (
-          <MenuItem
-            onClick={() => {
-              onEditRow();
-              handleClosePopover();
-            }}
-          >
-            <Iconify icon="eva:edit-fill" />
-            Chỉnh sửa
-          </MenuItem>
-        )}
+        <MenuItem
+          onClick={() => {
+            onEditRow();
+            handleClosePopover();
+          }}
+        >
+          <Iconify icon="eva:edit-fill" />
+          Chỉnh sửa
+        </MenuItem>
       </MenuPopover>
 
       <ConfirmDialog

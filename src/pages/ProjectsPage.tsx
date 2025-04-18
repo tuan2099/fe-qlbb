@@ -3,12 +3,6 @@ import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
-import { LoadingButton } from '@mui/lab';
-
-import DataTable from 'src/components/table/Table';
-import { SignBoardTableColumns } from 'src/utils/column';
-import { deleteSignboard, getAllSignboard } from 'src/apis/signboard.api';
-// @mui
 import {
   Tab,
   Tabs,
@@ -22,13 +16,9 @@ import {
   IconButton,
   TableContainer,
 } from '@mui/material';
-// api
-import { deleteWarehouse, getWarehouses } from 'src/apis/warehouse.api';
-// settings
+
 import { useSettingsContext } from 'src/components/settings';
-// routes
 import { PATH_DASHBOARD } from '../routes/paths';
-// components
 import {
   useTable,
   getComparator,
@@ -43,28 +33,24 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-
-// utils
-import { StorageTableColumns } from 'src/utils/column';
-// sections
-import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
+import { WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
 import { IWarehouse } from 'src/types/warehosue.type';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
-import { SignboardTableRow } from 'src/sections/@dashboard/signboard';
-// ----------------------------------------------------------------------
+import { deleteProject, getAllProject } from 'src/apis/projects.api';
+import { ProjectTableRow } from 'src/sections/@dashboard/project';
+
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Tên Kho', align: 'left' },
-  { id: 'type', label: 'Loại biển bảng', align: 'left' },
-  { id: 'material', label: 'Chất liệu', align: 'left' },
-  { id: 'status', label: 'Trang thái', align: 'left' },
-  { id: 'import_price', label: 'Giá nhập', align: 'left' },
-  { id: 'selling_price', label: 'Giá bán', align: 'left' },
-  { id: 'expiry_date', label: 'Ngày hết hạn', align: 'left' },
-  { id: 'min_quantity', label: 'Số lượng tối thiểu', align: 'left' },
-  { id: 'max_quantity', label: 'Số lượng tối đa', align: 'left' },
+  { id: 'name', label: 'Tên dự án', align: 'left' },
+  { id: 'address', label: 'Địa chỉ', align: 'left' },
+  { id: 'director', label: 'Giám đốc tòa nhà', align: 'left' },
+  { id: 'project_type', label: 'Loại dự án', align: 'left' },
+  { id: 'region', label: 'Khu vực', align: 'left' },
+  { id: 'branch', label: 'Chi nhánh phụ trách', align: 'left' },
+  { id: 'status', label: 'Tình trạng dự án', align: 'left' },
+  { id: 'contact_person', label: 'Người liên hệ chính', align: 'left' },
 ];
 
 const ROLE_OPTIONS = [
@@ -80,7 +66,7 @@ const ROLE_OPTIONS = [
   'full stack developer',
 ];
 
-const SignBoard = () => {
+const ProjectsPage = () => {
   const {
     dense,
     page,
@@ -89,16 +75,15 @@ const SignBoard = () => {
     rowsPerPage,
     setPage,
     selected,
-    setSelected,
     onSelectRow,
     onSelectAllRows,
     onSort,
     onChangeDense,
-    onChangePage,
     onChangeRowsPerPage,
   } = useTable({ defaultRowsPerPage: 10 });
 
   const { themeStretch } = useSettingsContext();
+  const { enqueueSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
 
@@ -117,21 +102,21 @@ const SignBoard = () => {
   const page2 = searchParams.get('page') || '1';
 
   const {
-    data: signboardData,
+    data: projectData,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['signboard', page2],
-    queryFn: () => getAllSignboard({ page: page2 }),
+    queryKey: ['project', page2],
+    queryFn: () => getAllProject({ page: page2 }),
   });
 
   useEffect(() => {
-    if (signboardData?.data?.response?.[0]) {
-      const res = signboardData.data.response[0];
+    if (projectData?.data?.response?.[0]) {
+      const res = projectData.data.response[0];
       setTableData(res.data);
       setPage(res.current_page - 1);
     }
-  }, [signboardData]);
+  }, [projectData]);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -141,7 +126,6 @@ const SignBoard = () => {
     filterManager,
   });
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   const denseHeight = dense ? 52 : 72;
 
   const isFiltered = filterName !== '' || filterCode !== 'all' || filterManager !== 'all';
@@ -159,7 +143,7 @@ const SignBoard = () => {
     setOpenConfirm(false);
   };
 
-  const handleFilterCode = (event: React.SyntheticEvent<Element, Event>, newValue: string) => {
+  const handleFilterCode = (_: React.SyntheticEvent<Element, Event>, newValue: string) => {
     setPage(0);
     setFilterCode(newValue);
   };
@@ -175,35 +159,22 @@ const SignBoard = () => {
   };
 
   const handleDeleteRole = useMutation({
-    mutationFn: (id: number) => deleteWarehouse(id),
+    mutationFn: (id: number) => deleteProject(id),
     onSuccess: () => {
+      enqueueSnackbar('Xóa thành công', { variant: 'success' });
       refetch();
     },
-    onError: (err) => {},
+    onError: (_) => {
+      enqueueSnackbar('Đã có lỗi xảy ra.', { variant: 'error' });
+    },
   });
 
   const handleDeleteRow = (id: number) => {
     handleDeleteRole.mutate(id);
   };
 
-  const handleDeleteRows = (selected: string[]) => {
-    // const deleteRows = tableData.filter((row) => !selected.includes(row.id));
-    // setSelected([]);
-    // setTableData(deleteRows);
-    // if (page > 0) {
-    //   if (selected.length === dataInPage.length) {
-    //     setPage(page - 1);
-    //   } else if (selected.length === dataFiltered.length) {
-    //     setPage(0);
-    //   } else if (selected.length > dataInPage.length) {
-    //     const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
-    //     setPage(newPage);
-    //   }
-    // }
-  };
-
   const handleEditRow = (id: number) => {
-    navigate(`/dashboard/signboard/update/${id}`);
+    navigate(`/dashboard/project/update/${id}`);
   };
 
   const handleResetFilter = () => {
@@ -215,27 +186,27 @@ const SignBoard = () => {
   return (
     <>
       <Helmet>
-        <title> Biển Bảng | PMC</title>
+        <title> Dự án | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Biển bảng"
+          heading="Dự án"
           links={[
             { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Biển bảng', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh biển bảng' },
+            { name: 'Dự án', href: PATH_DASHBOARD.user.root },
+            { name: 'Danh sách dự án' },
           ]}
           action={
             <>
               {hasPermission('storage_create') && (
                 <Button
-                  to="/dashboard/signboard/add"
+                  to="/dashboard/project/add"
                   component={RouterLink}
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  Tạo biển bảng
+                  Tạo dự án
                 </Button>
               )}
             </>
@@ -306,14 +277,13 @@ const SignBoard = () => {
                 />
 
                 <TableBody>
-                  \
                   {isLoading &&
                     Array(10)
                       .fill(0)
                       .map((_, i) => <TableSkeleton key={i} />)}
                   {!isLoading &&
                     tableData.map((row) => (
-                      <SignboardTableRow
+                      <ProjectTableRow
                         key={row.id}
                         row={row}
                         selected={selected.includes(row.id)}
@@ -333,7 +303,7 @@ const SignBoard = () => {
           </TableContainer>
 
           <TablePaginationCustom
-            count={signboardData?.data?.response?.[0]?.total || 0}
+            count={projectData?.data?.response?.[0]?.total || 0}
             page={page}
             rowsPerPage={rowsPerPage}
             onPageChange={(event, newPage) => {
@@ -350,7 +320,7 @@ const SignBoard = () => {
   );
 };
 
-export default SignBoard;
+export default ProjectsPage;
 
 function applyFilter({
   inputData,

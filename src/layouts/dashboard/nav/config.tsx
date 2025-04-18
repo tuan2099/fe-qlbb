@@ -86,6 +86,11 @@ const navConfig = [
         path: PATH_DASHBOARD.signboard,
         icon: ICONS.product,
       },
+      {
+        title: 'Dự án',
+        path: PATH_DASHBOARD.project,
+        icon: ICONS.product,
+      },
     ],
   },
 ];
