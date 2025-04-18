@@ -30,7 +30,7 @@ type Props = {
     onDeleteRow: VoidFunction;
 };
 
-export default function WarehouseTableRow({
+export default function SignboardTableRow({
     row,
     selected,
     onEditRow,
@@ -109,7 +109,7 @@ export default function WarehouseTableRow({
                         Xoá
                     </MenuItem>
                 )}
-                {hasPermission('storage_edit') && (
+                {hasPermission('storage_update') && (
                     <MenuItem
                         onClick={() => {
                             onEditRow();
