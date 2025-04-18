@@ -9,7 +9,7 @@ type Props = {
   editable?: boolean;
 };
 
-export default function RHFDatePicker({ name, label, editable, ...other }: Props) {
+export default function RHFDatePicker({ name, label, editable = true, ...other }: Props) {
   const { control } = useFormContext();
 
   return (

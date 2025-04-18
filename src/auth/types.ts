@@ -17,6 +17,8 @@ export type AuthStateType = {
   isAuthenticated: boolean;
   isInitialized: boolean;
   user: AuthUserType;
+  permissions?: any[]; // hoặc RoleType[] nếu bạn có định nghĩa sẵn
+  userRole?: any;
 };
 
 // ----------------------------------------------------------------------
@@ -26,6 +28,8 @@ export type JWTContextType = {
   isAuthenticated: boolean;
   isInitialized: boolean;
   user: AuthUserType;
+  permissions?: any[]; // hoặc RoleType[] nếu bạn có định nghĩa sẵn
+  userRole?: any;
 
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;

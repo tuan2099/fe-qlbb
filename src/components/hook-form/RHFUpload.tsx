@@ -20,7 +20,7 @@ interface Props extends Omit<UploadProps, 'file'> {
 
 // ----------------------------------------------------------------------
 
-export default function RHFUploadAvatar({ name, editable, ...other }: Props) {
+export default function RHFUploadAvatar({ name, editable = true, ...other }: Props) {
   const { control } = useFormContext();
 
   return (
