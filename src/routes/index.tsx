@@ -24,7 +24,9 @@ import {
   WarehouseDispatchPage,
   SignBoard,
   AddSignBoard,
-  AddWarehouseDispatch
+  AddWarehouseDispatch,
+  ProjectsPage,
+  AddProject,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -96,6 +98,14 @@ export default function Router() {
             { element: <SignBoard replace />, index: true },
             { path: 'add', element: <AddSignBoard /> },
             { path: 'update/:id', element: <AddSignBoard /> },
+          ],
+        },
+        {
+          path: 'project',
+          children: [
+            { element: <ProjectsPage replace />, index: true },
+            { path: 'add', element: <AddProject /> },
+            { path: 'update/:id', element: <AddProject /> },
           ],
         },
         {

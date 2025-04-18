@@ -186,7 +186,7 @@ export default function AddSignBoard() {
 
       const newData = {
         ...data,
-        image: photoURL,
+        image: typeof photoURL === 'string' ? photoURL : '',
       };
       if (id) handleUpdate.mutate(newData);
       else handleCreate.mutate(newData);
