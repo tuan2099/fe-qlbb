@@ -77,6 +77,11 @@ const navConfig = [
         icon: ICONS.supplier,
       },
       {
+        title: 'Nhập kho',
+        path: PATH_DASHBOARD.warehouseImport,
+        icon: ICONS.product,
+      },
+      {
         title: 'Xuất kho',
         path: PATH_DASHBOARD.warehosueDispatch,
         icon: ICONS.ecommerce,
