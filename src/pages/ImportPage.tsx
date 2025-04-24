@@ -52,19 +52,22 @@ import { IWarehouse } from 'src/types/warehosue.type';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
 import { SignboardTableRow } from 'src/sections/@dashboard/signboard';
+import { deleteImport, getAllImport } from 'src/apis/import.api';
+import { ImportTableRow } from 'src/sections/@dashboard/import';
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Tên Kho', align: 'left' },
-  { id: 'type', label: 'Loại biển bảng', align: 'left' },
-  { id: 'material', label: 'Chất liệu', align: 'left' },
+  { id: 'code', label: 'CODE', align: 'left' },
+  { id: 'creator', label: 'Người tạo', align: 'left' },
+  { id: 'due_date', label: 'Ngày thanh toán', align: 'left' },
   { id: 'status', label: 'Trang thái', align: 'left' },
-  { id: 'import_price', label: 'Giá nhập', align: 'left' },
-  { id: 'selling_price', label: 'Giá bán', align: 'left' },
-  { id: 'expiry_date', label: 'Ngày hết hạn', align: 'left' },
-  { id: 'min_quantity', label: 'Số lượng tối thiểu', align: 'left' },
-  { id: 'max_quantity', label: 'Số lượng tối đa', align: 'left' },
+  { id: 'import_type', label: 'Loại nhập', align: 'left' },
+  { id: 'vat', label: 'VAT', align: 'left' },
+  { id: 'paid_amount', label: 'Số tiền đã thanh toán', align: 'left' },
+  { id: 'receiver', label: 'Người nhận', align: 'left' },
+  { id: 'storage', label: 'Kho', align: 'left' },
+  { id: 'supplier', label: 'Nhà cung cấp', align: 'left' },
 ];
 
 const ROLE_OPTIONS = [
@@ -80,7 +83,7 @@ const ROLE_OPTIONS = [
   'full stack developer',
 ];
 
-const SignBoard = () => {
+const ImportPage = () => {
   const {
     dense,
     page,
@@ -117,21 +120,21 @@ const SignBoard = () => {
   const page2 = searchParams.get('page') || '1';
 
   const {
-    data: signboardData,
+    data: importData,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['signboard', page2],
-    queryFn: () => getAllSignboard({ page: page2 }),
+    queryKey: ['import', page2],
+    queryFn: () => getAllImport({ page: page2 }),
   });
 
   useEffect(() => {
-    if (signboardData?.data?.response?.[0]) {
-      const res = signboardData.data.response[0];
+    if (importData?.data?.response?.[0]) {
+      const res = importData.data.response[0];
       setTableData(res.data);
       setPage(res.current_page - 1);
     }
-  }, [signboardData]);
+  }, [importData]);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -174,7 +177,7 @@ const SignBoard = () => {
   };
 
   const handleDeleteRole = useMutation({
-    mutationFn: (id: number) => deleteWarehouse(id),
+    mutationFn: (id: number) => deleteImport(id),
     onSuccess: () => {
       refetch();
     },
@@ -202,7 +205,7 @@ const SignBoard = () => {
   };
 
   const handleEditRow = (id: number) => {
-    navigate(`/dashboard/signboard/update/${id}`);
+    navigate(`/dashboard/warehouse-import/update/${id}`);
   };
 
   const handleResetFilter = () => {
@@ -214,27 +217,27 @@ const SignBoard = () => {
   return (
     <>
       <Helmet>
-        <title> Biển Bảng | PMC</title>
+        <title> Nhập Kho | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Biển bảng"
+          heading="Nhập kho"
           links={[
             { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Biển bảng', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh biển bảng' },
+            { name: 'Nhập kho', href: PATH_DASHBOARD.user.root },
+            { name: 'Danh nhập kho' },
           ]}
           action={
             <>
-              {hasPermission('storage_create') && (
+              {hasPermission('import_create') && (
                 <Button
-                  to="/dashboard/signboard/add"
+                  to="/dashboard/warehouse-import/add"
                   component={RouterLink}
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  Tạo biển bảng
+                  Tạo phiếu nhập
                 </Button>
               )}
             </>
@@ -311,7 +314,7 @@ const SignBoard = () => {
                       .map((_, i) => <TableSkeleton key={i} />)}
                   {!isLoading &&
                     tableData.map((row) => (
-                      <SignboardTableRow
+                      <ImportTableRow
                         key={row.id}
                         row={row}
                         selected={selected.includes(row.id)}
@@ -331,7 +334,7 @@ const SignBoard = () => {
           </TableContainer>
 
           <TablePaginationCustom
-            count={signboardData?.data?.response?.[0]?.total || 0}
+            count={importData?.data?.response?.[0]?.total || 0}
             page={page}
             rowsPerPage={rowsPerPage}
             onPageChange={(event, newPage) => {
@@ -348,7 +351,7 @@ const SignBoard = () => {
   );
 };
 
-export default SignBoard;
+export default ImportPage;
 
 function applyFilter({
   inputData,

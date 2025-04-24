@@ -27,6 +27,8 @@ import {
   AddWarehouseDispatch,
   ProjectsPage,
   AddProject,
+  ImportPage,
+  AddWarehouseImport,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -114,6 +116,14 @@ export default function Router() {
             { element: <WarehouseDispatchPage replace />, index: true },
             { path: 'add', element: <AddWarehouseDispatch /> },
             // { path: 'update/:id', element: <WarehouseDispatchPage /> }
+          ],
+        },
+        {
+          path: 'warehouse-import',
+          children: [
+            { element: <ImportPage replace />, index: true },
+            { path: 'add', element: <AddWarehouseImport /> },
+            { path: 'update/:id', element: <AddWarehouseImport /> },
           ],
         },
       ],

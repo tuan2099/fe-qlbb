@@ -28,6 +28,11 @@ export const SignBoard = Loadable(lazy(() => import('../pages/SignBoard')));
 export const AddSignBoard = Loadable(lazy(() => import('../pages/AddSignBoard')));
 export const ProjectsPage = Loadable(lazy(() => import('../pages/ProjectsPage')));
 export const AddProject = Loadable(lazy(() => import('../pages/AddProject')));
+export const AddWarehouseImport = Loadable(
+  lazy(() => import('../pages/dasshboards/AddWarehouseImport'))
+);
+
+export const ImportPage = Loadable(lazy(() => import('../pages/ImportPage')));
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
 

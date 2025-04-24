@@ -42,3 +42,31 @@ export const deleteWarehouse = (id: any) => {
     },
   });
 };
+
+export const fetchAllWarehouse = async (): Promise<any[]> => {
+  let allData: any[] = [];
+  let hasNext = true;
+  let page = '';
+  while (hasNext) {
+    const response = await http.get('/storage', {
+      params: {
+        page,
+        limit: 100,
+      },
+
+      headers: {
+        Authorization: `Bearer ${getStorage('accessToken')}`,
+      },
+    });
+
+    const data = response.data?.response[0].data || [];
+    allData = [...allData, ...data];
+
+    if (data.length < 100) {
+      hasNext = false;
+    } else {
+    }
+  }
+
+  return allData;
+};
