@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // form
 import { useFormContext } from 'react-hook-form';
 // @mui
@@ -66,6 +66,22 @@ export default function InvoiceNewEditAddress() {
       },
     ],
   });
+
+  useEffect(() => {
+    if (storages.data && storage_id) {
+      const foundStorage = storages.data.find((item: any) => item.id === storage_id.id);
+      if (foundStorage) {
+        setStorageValue(foundStorage);
+      }
+    }
+
+    if (suplliers.data && supplier_id) {
+      const foundSupplier = suplliers.data.find((item: any) => item.id === supplier_id.id);
+      if (foundSupplier) {
+        setSupplierValue(foundSupplier);
+      }
+    }
+  }, [storages, suplliers, storage_id, supplier_id]);
 
   return (
     <Stack

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -20,7 +20,7 @@ import InvoiceNewEditDetails from './InvoiceNewEditDetails';
 import InvoiceNewEditAddress from './InvoiceNewEditAddress';
 import InvoiceNewEditStatusDate from './InvoiceNewEditStatusDate';
 import { useMutation } from '@tanstack/react-query';
-import { addImport } from 'src/apis/import.api';
+import { addImport, updateImport } from 'src/apis/import.api';
 import { useSnackbar } from 'notistack';
 
 // ----------------------------------------------------------------------
@@ -41,6 +41,8 @@ type Props = {
 export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+  const { id } = useParams();
+  const isAddMode = !Boolean(id);
 
   const [loadingSave, setLoadingSave] = useState(false);
 
@@ -54,14 +56,14 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
 
   const defaultValues = useMemo(
     () => ({
-      due_date: currentInvoice?.dueDate || null,
+      due_date: currentInvoice?.due_date || null,
       status: currentInvoice?.status || 'Đã thanh toán',
       supplier_id: currentInvoice?.supplier || null,
       storage_id: currentInvoice?.storage || null,
       details: currentInvoice?.details || [],
       totalPrice: currentInvoice?.totalPrice || 0,
       import_type: currentInvoice?.import_type || 'Mới',
-      receiver_id: currentInvoice?.currentInvoice || '',
+      receiver_id: currentInvoice?.receiver_id || '',
       signature_receiver: currentInvoice?.signature_receiver || '',
       signature_deliverer: currentInvoice?.signature_deliverer || '',
       signature_storekeeper: currentInvoice?.signature_storekeeper || '',
@@ -101,8 +103,26 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
     },
   });
 
+  const handleUpdate = useMutation({
+    mutationFn: (data: any) => {
+      const cleanedData = {
+        ...data,
+        supplier_id: typeof data.supplier_id === 'object' ? data.supplier_id.id : data.supplier_id,
+        storage_id: typeof data.storage_id === 'object' ? data.storage_id.id : data.storage_id,
+      };
+      return updateImport({ id, data: cleanedData });
+    },
+    onSuccess: () => {
+      enqueueSnackbar('Phiếu nhập đã được cập nhập.', { variant: 'success' });
+    },
+    onError: (err) => {
+      enqueueSnackbar(err.message, { variant: 'error' });
+    },
+  });
+
   const handleCreateAndSend = (data: FormValuesProps) => {
-    handleCreate.mutate(data);
+    if (isAddMode) handleCreate.mutate(data);
+    else handleUpdate.mutate(data);
   };
 
   return (
@@ -119,7 +139,7 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
         <LoadingButton
           size="large"
           variant="contained"
-          loading={handleCreate.isPending}
+          loading={handleCreate.isPending || handleUpdate.isPending}
           onClick={handleSubmit(handleCreateAndSend)}
         >
           {isEdit ? 'Cập nhập' : 'Tạo'} phiếu nhập

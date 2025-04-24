@@ -8,9 +8,20 @@ import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
 // sections
 import InvoiceNewEditForm from '../../sections/@dashboard/warehouseImport/form';
+import { useParams } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
+import { getImport } from 'src/apis/import.api';
 
 export default function AddWarehouseImport() {
   const { themeStretch } = useSettingsContext();
+  const { id } = useParams();
+  const isAddMode = !Boolean(id);
+
+  const { data: importData, isLoading } = useQuery({
+    queryKey: ['import', id],
+    queryFn: () => getImport(id),
+    enabled: Boolean(id),
+  });
 
   return (
     <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -27,7 +38,7 @@ export default function AddWarehouseImport() {
         ]}
       />
 
-      <InvoiceNewEditForm />
+      <InvoiceNewEditForm isEdit={!isAddMode} currentInvoice={importData?.data.response[0]} />
     </Container>
   );
 }
