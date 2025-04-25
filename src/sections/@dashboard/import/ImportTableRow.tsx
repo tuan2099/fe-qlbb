@@ -97,7 +97,7 @@ export default function ImportTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        {hasPermission('storage_delete') && (
+        {hasPermission('import_delete') && (
           <MenuItem
             onClick={() => {
               handleOpenConfirm();
@@ -109,7 +109,7 @@ export default function ImportTableRow({
             Xoá
           </MenuItem>
         )}
-        {hasPermission('storage_update') && (
+        {hasPermission('import_edit') && (
           <MenuItem
             onClick={() => {
               onEditRow();
