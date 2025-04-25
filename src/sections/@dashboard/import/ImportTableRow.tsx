@@ -98,17 +98,18 @@ export default function ImportTableRow({
         sx={{ width: 140 }}
       >
         {hasPermission('import_delete') && (
-          <MenuItem
-            onClick={() => {
-              handleOpenConfirm();
-              handleClosePopover();
-            }}
-            sx={{ color: 'error.main' }}
-          >
-            <Iconify icon="eva:trash-2-outline" />
-            Xoá
-          </MenuItem>
-        )}
+          { hasPermission('import_delete') && (
+            <MenuItem
+              onClick={() => {
+                handleOpenConfirm();
+                handleClosePopover();
+              }}
+              sx={{ color: 'error.main' }}
+            >
+              <Iconify icon="eva:trash-2-outline" />
+              Xoá
+            </MenuItem>
+          )}
         {hasPermission('import_edit') && (
           <MenuItem
             onClick={() => {
@@ -120,6 +121,15 @@ export default function ImportTableRow({
             Chỉnh sửa
           </MenuItem>
         )}
+        <MenuItem
+          onClick={() => {
+            onEditRow();
+            handleClosePopover();
+          }}
+        >
+          <Iconify icon="eva:edit-fill" />
+          Chỉnh sửa
+        </MenuItem>
       </MenuPopover>
 
       <ConfirmDialog
