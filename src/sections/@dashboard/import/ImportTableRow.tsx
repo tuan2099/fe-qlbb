@@ -97,7 +97,7 @@ export default function ImportTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        {hasPermission('storage_delete') && (
+        {hasPermission('import_delete') && (
           <MenuItem
             onClick={() => {
               handleOpenConfirm();
@@ -109,7 +109,7 @@ export default function ImportTableRow({
             Xoá
           </MenuItem>
         )}
-        {hasPermission('storage_update') && (
+        {/* {hasPermission('import_update') && (
           <MenuItem
             onClick={() => {
               onEditRow();
@@ -119,7 +119,16 @@ export default function ImportTableRow({
             <Iconify icon="eva:edit-fill" />
             Chỉnh sửa
           </MenuItem>
-        )}
+        )} */}
+        <MenuItem
+          onClick={() => {
+            onEditRow();
+            handleClosePopover();
+          }}
+        >
+          <Iconify icon="eva:edit-fill" />
+          Chỉnh sửa
+        </MenuItem>
       </MenuPopover>
 
       <ConfirmDialog

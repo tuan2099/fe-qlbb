@@ -27,6 +27,8 @@ export default function InvoiceNewEditStatusDate() {
 
   const values = watch();
 
+  console.log(values);
+
   return (
     <Stack
       spacing={2}
