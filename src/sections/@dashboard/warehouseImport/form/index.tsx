@@ -22,6 +22,7 @@ import InvoiceNewEditStatusDate from './InvoiceNewEditStatusDate';
 import { useMutation } from '@tanstack/react-query';
 import { addImport, updateImport } from 'src/apis/import.api';
 import { useSnackbar } from 'notistack';
+import { uploadAvatar } from 'src/apis/user.api';
 
 // ----------------------------------------------------------------------
 
@@ -93,6 +94,15 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, currentInvoice]);
 
+  const handleUploadImage = useMutation({
+    mutationFn: (file: any) => {
+      const data = { upload_preset: 'ml_default', file };
+      return uploadAvatar(data);
+    },
+    onError: () => {
+      enqueueSnackbar('Có lỗi xảy ra ! Vui lòng thử lại.', { variant: 'error' });
+    },
+  });
   const handleCreate = useMutation({
     mutationFn: (data: any) => addImport(data),
     onSuccess: () => {
@@ -120,9 +130,27 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
     },
   });
 
-  const handleCreateAndSend = (data: FormValuesProps) => {
-    if (isAddMode) handleCreate.mutate(data);
-    else handleUpdate.mutate(data);
+  const handleCreateAndSend = async (values: FormValuesProps) => {
+    const entries = Object.entries(values);
+    const updatedValues = { ...values };
+
+    for (const [key, value] of entries) {
+      if (value instanceof File) {
+        try {
+          const url = await handleUploadImage.mutateAsync(value);
+          updatedValues[key] = url.data.secure_url;
+        } catch (err) {
+          enqueueSnackbar(err.message, { variant: 'error' });
+        }
+      }
+    }
+
+    try {
+      if (isAddMode) await handleCreate.mutateAsync(updatedValues);
+      else await handleUpdate.mutateAsync(updatedValues);
+    } catch (err) {
+      enqueueSnackbar('Đã có lỗi xảy ra', { variant: 'error' });
+    }
   };
 
   return (
