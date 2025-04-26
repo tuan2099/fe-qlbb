@@ -21,7 +21,7 @@ type FormValuesProps = {
 };
 
 export default function AuthLoginForm() {
-  const { login } = useAuthContext();
+  const { login, initialize } = useAuthContext();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -50,6 +50,7 @@ export default function AuthLoginForm() {
   const onSubmit = async (data: FormValuesProps) => {
     try {
       await login(data.email, data.password);
+      initialize();
     } catch (error) {
       reset();
       setError('afterSubmit', {
