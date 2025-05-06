@@ -22,8 +22,7 @@ import {
   IconButton,
   TableContainer,
 } from '@mui/material';
-// api
-import { deleteWarehouse, getWarehouses } from 'src/apis/warehouse.api';
+
 // settings
 import { useSettingsContext } from 'src/components/settings';
 // routes

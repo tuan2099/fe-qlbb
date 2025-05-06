@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -19,16 +19,20 @@ import FormProvider from '../../../../components/hook-form';
 import InvoiceNewEditDetails from './InvoiceNewEditDetails';
 import InvoiceNewEditAddress from './InvoiceNewEditAddress';
 import InvoiceNewEditStatusDate from './InvoiceNewEditStatusDate';
+import { useMutation } from '@tanstack/react-query';
+import { addImport, updateImport } from 'src/apis/import.api';
+import { useSnackbar } from 'notistack';
+import { uploadAvatar } from 'src/apis/user.api';
+import { addExport, updateExport } from 'src/apis/export.api';
 
 // ----------------------------------------------------------------------
 
 type IFormValuesProps = Omit<any, 'createDate' | 'dueDate' | 'invoiceFrom' | 'invoiceTo'>;
 
 interface FormValuesProps extends IFormValuesProps {
-  createDate: Date | null;
-  dueDate: Date | null;
-  invoiceFrom: any | null;
-  invoiceTo: any | null;
+  due_date: Date | null;
+  storage_id: any | null;
+  project_id: any | null;
 }
 
 type Props = {
@@ -37,32 +41,31 @@ type Props = {
 };
 
 export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
-  const navigate = useNavigate();
-
-  const [loadingSave, setLoadingSave] = useState(false);
-
-  const [loadingSend, setLoadingSend] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { id } = useParams();
+  const isAddMode = !Boolean(id);
 
   const NewUserSchema = Yup.object().shape({
-    createDate: Yup.string().nullable().required('Create date is required'),
-    dueDate: Yup.string().nullable().required('Due date is required'),
-    invoiceTo: Yup.mixed().nullable().required('Invoice to is required'),
+    due_date: Yup.string().nullable().required('Due date is required'),
+    project_id: Yup.mixed().nullable().required('Project is required'),
+    storage_id: Yup.mixed().nullable().required('storage is required'),
   });
 
   const defaultValues = useMemo(
     () => ({
-      invoiceNumber: currentInvoice?.invoiceNumber || '17099',
-      createDate: currentInvoice?.createDate || new Date(),
-      dueDate: currentInvoice?.dueDate || null,
-      taxes: currentInvoice?.taxes || 0,
-      status: currentInvoice?.status || 'draft',
-      discount: currentInvoice?.discount || 0,
-      invoiceFrom: currentInvoice?.invoiceFrom || _invoiceAddressFrom[0],
-      invoiceTo: currentInvoice?.invoiceTo || null,
-      items: currentInvoice?.items || [
-        { title: '', description: '', service: '', quantity: 1, price: 0, total: 0 },
-      ],
+      due_date: currentInvoice?.due_date || null,
+      status: currentInvoice?.status || 'Đã thanh toán',
+      project_id: currentInvoice?.project_id || null,
+      storage_id: currentInvoice?.storage || null,
+      details: currentInvoice?.details || [],
       totalPrice: currentInvoice?.totalPrice || 0,
+      export_type: currentInvoice?.export_type || 'Mới',
+      deliverer_id: currentInvoice?.deliverer_id || '',
+      signature_receiver: currentInvoice?.signature_receiver || '',
+      signature_deliverer: currentInvoice?.signature_deliverer || '',
+      signature_storekeeper: currentInvoice?.signature_storekeeper || '',
+      signature_accountant: currentInvoice?.signature_accountant || '',
+      vat: currentInvoice?.vat || '',
     }),
     [currentInvoice]
   );
@@ -88,33 +91,63 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, currentInvoice]);
 
-  const handleSaveAsDraft = async (data: FormValuesProps) => {
-    setLoadingSave(true);
+  const handleUploadImage = useMutation({
+    mutationFn: (file: any) => {
+      const data = { upload_preset: 'ml_default', file };
+      return uploadAvatar(data);
+    },
+    onError: () => {
+      enqueueSnackbar('Có lỗi xảy ra ! Vui lòng thử lại.', { variant: 'error' });
+    },
+  });
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      setLoadingSave(false);
-      // navigate(PATH_DASHBOARD.invoice.list);
-      console.log('DATA', JSON.stringify(data, null, 2));
-    } catch (error) {
-      console.error(error);
-      setLoadingSave(false);
+  const handleCreate = useMutation({
+    mutationFn: (data: any) => addExport(data),
+    onSuccess: () => {
+      enqueueSnackbar('Phiếu xuất đã được tạo.', { variant: 'success' });
+    },
+    onError: (err) => {
+      enqueueSnackbar(err.message, { variant: 'error' });
+    },
+  });
+
+  const handleUpdate = useMutation({
+    mutationFn: (data: any) => {
+      const cleanedData = {
+        ...data,
+        project_id: typeof data.project_id === 'object' ? data.project_id.id : data.project_id,
+        storage_id: typeof data.storage_id === 'object' ? data.storage_id.id : data.storage_id,
+      };
+      return updateExport({ id, data: cleanedData });
+    },
+    onSuccess: () => {
+      enqueueSnackbar('Phiếu xuất đã được cập nhập.', { variant: 'success' });
+    },
+    onError: (err) => {
+      enqueueSnackbar(err.message, { variant: 'error' });
+    },
+  });
+
+  const handleCreateAndSend = async (values: FormValuesProps) => {
+    const entries = Object.entries(values);
+    const updatedValues = { ...values };
+
+    for (const [key, value] of entries) {
+      if (value instanceof File) {
+        try {
+          const url = await handleUploadImage.mutateAsync(value);
+          updatedValues[key] = url.data.secure_url;
+        } catch (err) {
+          enqueueSnackbar(err.message, { variant: 'error' });
+        }
+      }
     }
-  };
-
-  const handleCreateAndSend = async (data: FormValuesProps) => {
-    setLoadingSend(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      reset();
-      setLoadingSend(false);
-      // navigate(PATH_DASHBOARD.invoice.list);
-      console.log('DATA', JSON.stringify(data, null, 2));
-    } catch (error) {
-      console.error(error);
-      setLoadingSend(false);
+      if (isAddMode) await handleCreate.mutateAsync(updatedValues);
+      else await handleUpdate.mutateAsync(updatedValues);
+    } catch (err) {
+      enqueueSnackbar('Đã có lỗi xảy ra', { variant: 'error' });
     }
   };
 
@@ -130,22 +163,12 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
 
       <Stack justifyContent="flex-end" direction="row" spacing={2} sx={{ mt: 3 }}>
         <LoadingButton
-          color="inherit"
           size="large"
           variant="contained"
-          loading={loadingSave && isSubmitting}
-          onClick={handleSubmit(handleSaveAsDraft)}
-        >
-          Save as Draft
-        </LoadingButton>
-
-        <LoadingButton
-          size="large"
-          variant="contained"
-          loading={loadingSend && isSubmitting}
+          loading={handleCreate.isPending || handleUpdate.isPending}
           onClick={handleSubmit(handleCreateAndSend)}
         >
-          {isEdit ? 'Update' : 'Create'} & Send
+          {isEdit ? 'Cập nhập' : 'Tạo'} phiếu xuất
         </LoadingButton>
       </Stack>
     </FormProvider>
