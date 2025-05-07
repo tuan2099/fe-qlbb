@@ -1,10 +1,7 @@
-import { useState } from 'react';
-// @mui
+import { useState, useContext } from 'react';
 import {
-  Link,
   Stack,
   Button,
-  Divider,
   Checkbox,
   TableRow,
   MenuItem,
@@ -12,39 +9,29 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-// utils
-import { fDate } from '../../../../utils/formatTime';
-import { fCurrency } from '../../../../utils/formatNumber';
-// @types
-// import { IInvoice } from '../../../../@types/invoice';
-// components
-import Label from '../../../../components/label';
+
 import Iconify from '../../../../components/iconify';
-import { CustomAvatar } from '../../../../components/custom-avatar';
 import MenuPopover from '../../../../components/menu-popover';
 import ConfirmDialog from '../../../../components/confirm-dialog';
-
+import { AuthContext } from 'src/auth/JwtContext';
+import { usePermission } from 'src/hooks/usePermisson';
 // ----------------------------------------------------------------------
 
 type Props = {
-  row: any;
+  row: any; // sau rồi sửa
   selected: boolean;
-  onSelectRow: VoidFunction;
-  onViewRow: VoidFunction;
   onEditRow: VoidFunction;
+  onSelectRow: VoidFunction;
   onDeleteRow: VoidFunction;
 };
 
-export default function WarehouseTableRow({
+export default function ExportTableRow({
   row,
   selected,
-  onSelectRow,
-  onViewRow,
   onEditRow,
+  onSelectRow,
   onDeleteRow,
 }: Props) {
-  const { sent, invoiceNumber, createDate, dueDate, status, invoiceTo, totalPrice } = row;
-
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
@@ -65,6 +52,8 @@ export default function WarehouseTableRow({
     setOpenPopover(null);
   };
 
+  const context = useContext(AuthContext);
+  const { hasPermission } = usePermission(context?.userRole, context?.permissions || []);
   return (
     <>
       <TableRow hover selected={selected}>
@@ -74,48 +63,21 @@ export default function WarehouseTableRow({
 
         <TableCell>
           <Stack direction="row" alignItems="center" spacing={2}>
-            <CustomAvatar name={invoiceTo.name} />
-
-            <div>
-              <Typography variant="subtitle2" noWrap>
-                {invoiceTo.name}
-              </Typography>
-
-              <Link
-                noWrap
-                variant="body2"
-                onClick={onViewRow}
-                sx={{ color: 'text.disabled', cursor: 'pointer' }}
-              >
-                {`INV-${invoiceNumber}`}
-              </Link>
-            </div>
+            <Typography variant="subtitle2" noWrap>
+              {row.code}
+            </Typography>
           </Stack>
         </TableCell>
 
-        <TableCell align="left">{fDate(createDate)}</TableCell>
-
-        <TableCell align="left">{fDate(dueDate)}</TableCell>
-
-        <TableCell align="center">{fCurrency(totalPrice)}</TableCell>
-
-        <TableCell align="center" sx={{ textTransform: 'capitalize' }}>
-          {sent}
-        </TableCell>
-
-        <TableCell align="left">
-          <Label
-            variant="soft"
-            color={
-              (status === 'paid' && 'success') ||
-              (status === 'unpaid' && 'warning') ||
-              (status === 'overdue' && 'error') ||
-              'default'
-            }
-          >
-            {status}
-          </Label>
-        </TableCell>
+        <TableCell align="left">{row.creator.name}</TableCell>
+        <TableCell align="left">{row.due_date}</TableCell>
+        <TableCell align="left">{row.status}</TableCell>
+        <TableCell align="left">{row.export_type}</TableCell>
+        <TableCell align="left">{row.vat}</TableCell>
+        <TableCell align="left">{row.paid_amount}</TableCell>
+        <TableCell align="left">{row.deliverer.name}</TableCell>
+        <TableCell align="left">{row.storage.name}</TableCell>
+        <TableCell align="left">{row.project.name}</TableCell>
 
         <TableCell align="right">
           <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
@@ -128,40 +90,31 @@ export default function WarehouseTableRow({
         open={openPopover}
         onClose={handleClosePopover}
         arrow="right-top"
-        sx={{ width: 160 }}
+        sx={{ width: 140 }}
       >
-        <MenuItem
-          onClick={() => {
-            onViewRow();
-            handleClosePopover();
-          }}
-        >
-          <Iconify icon="eva:eye-fill" />
-          View
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            onEditRow();
-            handleClosePopover();
-          }}
-        >
-          <Iconify icon="eva:edit-fill" />
-          Edit
-        </MenuItem>
-
-        <Divider sx={{ borderStyle: 'dashed' }} />
-
-        <MenuItem
-          onClick={() => {
-            handleOpenConfirm();
-            handleClosePopover();
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Iconify icon="eva:trash-2-outline" />
-          Delete
-        </MenuItem>
+        {hasPermission('import_delete') && (
+          <MenuItem
+            onClick={() => {
+              handleOpenConfirm();
+              handleClosePopover();
+            }}
+            sx={{ color: 'error.main' }}
+          >
+            <Iconify icon="eva:trash-2-outline" />
+            Xoá
+          </MenuItem>
+        )}
+        {hasPermission('export_edit') && (
+          <MenuItem
+            onClick={() => {
+              onEditRow();
+              handleClosePopover();
+            }}
+          >
+            <Iconify icon="eva:edit-fill" />
+            Chỉnh sửa
+          </MenuItem>
+        )}
       </MenuPopover>
 
       <ConfirmDialog
@@ -171,7 +124,7 @@ export default function WarehouseTableRow({
         content="Are you sure want to delete?"
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
-            Delete
+            Xoá
           </Button>
         }
       />

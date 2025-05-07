@@ -9,9 +9,7 @@ import {
   ListItemButton,
   InputAdornment,
 } from '@mui/material';
-// @types
-// import { IInvoiceAddress } from '../../../../@types/invoice';
-// components
+
 import Iconify from '../../../../components/iconify';
 import Scrollbar from '../../../../components/scrollbar';
 import SearchNotFound from '../../../../components/search-not-found';
@@ -57,14 +55,14 @@ export default function InvoiceAddressListDialog({
         justifyContent="space-between"
         sx={{ pt: 2.5, px: 3 }}
       >
-        <Typography variant="h6"> Select address </Typography>
+        <Typography variant="h6"> Chọn nhà cung cấp </Typography>
 
         <Button
           size="small"
           startIcon={<Iconify icon="eva:plus-fill" />}
           sx={{ alignSelf: 'flex-end' }}
         >
-          Add New
+          Tạo mới
         </Button>
       </Stack>
 

@@ -1,509 +1,376 @@
+import { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { SetStateAction, useState } from 'react';
-import sumBy from 'lodash/sumBy';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-// @mui
-import { useTheme } from '@mui/material/styles';
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-    Tab,
-    Tabs,
-    Card,
-    Table,
-    Stack,
-    Button,
-    Tooltip,
-    Divider,
-    TableBody,
-    Container,
-    IconButton,
-    TableContainer,
+  Tab,
+  Tabs,
+  Card,
+  Table,
+  Button,
+  Tooltip,
+  Divider,
+  TableBody,
+  Container,
+  IconButton,
+  TableContainer,
 } from '@mui/material';
-// routes
+
+import { useSettingsContext } from 'src/components/settings';
 import { PATH_DASHBOARD } from '../../routes/paths';
-// utils
-import { fTimestamp } from '../../utils/formatTime';
-// _mock_
-import { _invoices } from '../../_mock/arrays'
-// components
-import Label from '../../components/label';
+import {
+  useTable,
+  getComparator,
+  emptyRows,
+  TableNoData,
+  TableEmptyRows,
+  TableHeadCustom,
+  TableSelectedAction,
+  TablePaginationCustom,
+  TableSkeleton,
+} from 'src/components/table';
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
-import ConfirmDialog from '../../components/confirm-dialog';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
-import { useSettingsContext } from '../../components/settings';
-import {
-    useTable,
-    getComparator,
-    emptyRows,
-    TableNoData,
-    TableEmptyRows,
-    TableHeadCustom,
-    TableSelectedAction,
-    TablePaginationCustom,
-} from '../../components/table';
-import InvoiceAnalytic from 'src/sections/@dashboard/warehouseDispatch/InvoiceAnalytic';
-import WarehouseTableToolbar from 'src/sections/@dashboard/warehouseDispatch/list/WarehouseTableToolbar';
-import WarehouseTableRow from 'src/sections/@dashboard/warehouseDispatch/list/WarehouseTableRow';
-// sections
-// import InvoiceAnalytic from '../../sections/@dashboard/invoice/InvoiceAnalytic';
-// import { InvoiceTableRow, InvoiceTableToolbar } from '../../sections/@dashboard/invoice/list';
-
+import { WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
+import { IWarehouse } from 'src/types/warehosue.type';
+import { AuthContext } from 'src/auth/JwtContext';
+import { usePermission } from 'src/hooks/usePermisson';
+import { deleteExport, getAllExport } from 'src/apis/export.api';
+import ExportTableRow from 'src/sections/@dashboard/warehouseDispatch/list/WarehouseTableRow';
 // ----------------------------------------------------------------------
-const SERVICE_OPTIONS = [
-    'all',
-    'full stack development',
-    'backend development',
-    'ui design',
-    'ui/ux design',
-    'front end development',
+const STATUS_OPTIONS = ['all', 'active', 'banned'];
+
+const TABLE_HEAD = [
+  { id: 'code', label: 'CODE', align: 'left' },
+  { id: 'creator', label: 'Người tạo', align: 'left' },
+  { id: 'due_date', label: 'Ngày thanh toán', align: 'left' },
+  { id: 'status', label: 'Trang thái', align: 'left' },
+  { id: 'export_type', label: 'Loại xuất', align: 'left' },
+  { id: 'vat', label: 'VAT', align: 'left' },
+  { id: 'paid_amount', label: 'Số tiền đã thanh toán', align: 'left' },
+  { id: 'deliverer', label: 'Người giao', align: 'left' },
+  { id: 'storage', label: 'Kho', align: 'left' },
+  { id: 'project', label: 'Dự án', align: 'left' },
 ];
 
-export default function WarehousedispatchPage() {
-    const theme = useTheme();
+const ROLE_OPTIONS = [
+  'all',
+  'ux designer',
+  'full stack designer',
+  'backend developer',
+  'project manager',
+  'leader',
+  'ui designer',
+  'ui/ux designer',
+  'front end developer',
+  'full stack developer',
+];
 
-    const { themeStretch } = useSettingsContext();
+const WarehouseDispatchPage = () => {
+  const {
+    dense,
+    page,
+    order,
+    orderBy,
+    rowsPerPage,
+    setPage,
+    selected,
+    onSelectRow,
+    onSelectAllRows,
+    onSort,
+    onChangeDense,
+    onChangeRowsPerPage,
+  } = useTable({ defaultRowsPerPage: 10 });
 
-    const navigate = useNavigate();
+  const { themeStretch } = useSettingsContext();
 
-    const {
-        dense,
-        page,
-        order,
-        orderBy,
-        rowsPerPage,
-        setPage,
-        //
-        selected,
-        setSelected,
-        onSelectRow,
-        onSelectAllRows,
-        //
-        onSort,
-        onChangeDense,
-        onChangePage,
-        onChangeRowsPerPage,
-    } = useTable({ defaultOrderBy: 'createDate' });
+  const navigate = useNavigate();
 
-    const [tableData, setTableData] = useState(_invoices);
+  const [tableData, setTableData] = useState<IWarehouse[]>([]);
 
-    const [filterName, setFilterName] = useState('');
+  const [filterName, setFilterName] = useState('');
 
-    const [openConfirm, setOpenConfirm] = useState(false);
+  const [filterCode, setFilterCode] = useState('all');
 
-    const [filterStatus, setFilterStatus] = useState('all');
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const context = useContext(AuthContext);
+  const { hasPermission } = usePermission(context?.userRole, context?.permissions || []);
 
-    const [filterService, setFilterService] = useState('all');
+  const [filterManager, setFilterManager] = useState('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page2 = searchParams.get('page') || '1';
 
-    const [filterEndDate, setFilterEndDate] = useState<Date | null>(null);
+  const {
+    data: exportData,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ['export', page2],
+    queryFn: () => getAllExport({ page: page2 }),
+  });
 
-    const [filterStartDate, setFilterStartDate] = useState<Date | null>(null);
+  useEffect(() => {
+    if (exportData?.data?.response?.[0]) {
+      const res = exportData.data.response[0];
+      setTableData(res.data);
+      setPage(res.current_page - 1);
+    }
+  }, [exportData]);
 
-    const dataFiltered = applyFilter({
-        inputData: tableData,
-        comparator: getComparator(order, orderBy),
-        filterName,
-        filterService,
-        filterStatus,
-        filterStartDate,
-        filterEndDate,
-    });
+  const dataFiltered = applyFilter({
+    inputData: tableData,
+    comparator: getComparator(order, orderBy),
+    filterName,
+    filterCode,
+    filterManager,
+  });
 
-    const isFiltered =
-        filterStatus !== 'all' ||
-        filterName !== '' ||
-        filterService !== 'all' ||
-        (!!filterStartDate && !!filterEndDate);
+  const denseHeight = dense ? 52 : 72;
 
-    const isNotFound =
-        (!dataFiltered.length && !!filterName) ||
-        (!dataFiltered.length && !!filterStatus) ||
-        (!dataFiltered.length && !!filterService) ||
-        (!dataFiltered.length && !!filterEndDate) ||
-        (!dataFiltered.length && !!filterStartDate);
+  const isFiltered = filterName !== '' || filterCode !== 'all' || filterManager !== 'all';
 
-    const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const isNotFound =
+    (!dataFiltered.length && !!filterName) ||
+    (!dataFiltered.length && !!filterCode) ||
+    (!dataFiltered.length && !!filterManager);
 
-    const denseHeight = dense ? 56 : 76;
+  const handleOpenConfirm = () => {
+    setOpenConfirm(true);
+  };
 
-    const handleDeleteRow = (id: string) => {
-        const deleteRow = tableData.filter((row) => row.id !== id);
-        setSelected([]);
-        setTableData(deleteRow);
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
+  };
 
-        if (page > 0) {
-            if (dataInPage.length < 2) {
-                setPage(page - 1);
-            }
-        }
-    };
+  const handleFilterCode = (event: React.SyntheticEvent<Element, Event>, newValue: string) => {
+    setPage(0);
+    setFilterCode(newValue);
+  };
 
-    const handleDeleteRows = (selected: string[]) => {
-        const deleteRows = tableData.filter((row) => !selected.includes(row.id));
-        setSelected([]);
-        setTableData(deleteRows);
+  const handleFilterName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setFilterName(event.target.value);
+  };
 
-        if (page > 0) {
-            if (selected.length === dataInPage.length) {
-                setPage(page - 1);
-            } else if (selected.length === dataFiltered.length) {
-                setPage(0);
-            } else if (selected.length > dataInPage.length) {
-                const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
-                setPage(newPage);
-            }
-        }
-    };
+  const handleFilterManager = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPage(0);
+    setFilterManager(event.target.value);
+  };
 
-    const handleFilterName = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPage(0);
-        setFilterName(event.target.value);
-    };
+  const handleDeleteRole = useMutation({
+    mutationFn: (id: number) => deleteExport(id),
+    onSuccess: () => {
+      refetch();
+    },
+    onError: (err) => {},
+  });
 
-    const handleFilterService = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPage(0);
-        setFilterService(event.target.value);
-    };
+  const handleDeleteRow = (id: number) => {
+    handleDeleteRole.mutate(id);
+  };
 
-    const handleEditRow = (id: string) => {
-        // navigate(PATH_DASHBOARD.invoice.edit(id));
-    };
+  const handleDeleteRows = (selected: string[]) => {
+    // const deleteRows = tableData.filter((row) => !selected.includes(row.id));
+    // setSelected([]);
+    // setTableData(deleteRows);
+    // if (page > 0) {
+    //   if (selected.length === dataInPage.length) {
+    //     setPage(page - 1);
+    //   } else if (selected.length === dataFiltered.length) {
+    //     setPage(0);
+    //   } else if (selected.length > dataInPage.length) {
+    //     const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
+    //     setPage(newPage);
+    //   }
+    // }
+  };
 
-    const handleViewRow = (id: string) => {
-        // navigate(PATH_DASHBOARD.invoice.view(id));
-    };
+  const handleEditRow = (id: number) => {
+    navigate(`/dashboard/warehouse-dispatch/update/${id}`);
+  };
 
-    const handleResetFilter = () => {
-        setFilterName('');
-        setFilterStatus('all');
-        setFilterService('all');
-        setFilterEndDate(null);
-        setFilterStartDate(null);
-    };
+  const handleResetFilter = () => {
+    setFilterName('');
+    setFilterCode('all');
+    setFilterManager('all');
+  };
 
-    const handleOpenConfirm = () => {
-        setOpenConfirm(true);
-    };
+  return (
+    <>
+      <Helmet>
+        <title> Xuất Kho | PMC</title>
+      </Helmet>
 
-    const handleCloseConfirm = () => {
-        setOpenConfirm(false);
-    };
+      <Container maxWidth={themeStretch ? false : 'xl'}>
+        <CustomBreadcrumbs
+          heading="Xuất kho"
+          links={[
+            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
+            { name: 'Xuất kho', href: PATH_DASHBOARD.user.root },
+            { name: 'Danh xuất kho' },
+          ]}
+          action={
+            <>
+              {hasPermission('export_create') && (
+                <Button
+                  to="/dashboard/warehouse-dispatch/add"
+                  component={RouterLink}
+                  variant="contained"
+                  startIcon={<Iconify icon="eva:plus-fill" />}
+                >
+                  Tạo phiếu xuất
+                </Button>
+              )}
+            </>
+          }
+        />
 
-    const getLengthByStatus = (status: string) =>
-        tableData.filter((item) => item.status === status).length;
+        <Card>
+          <Tabs
+            value={filterCode}
+            onChange={handleFilterCode}
+            sx={{
+              px: 2,
+              bgcolor: 'background.neutral',
+            }}
+          >
+            {STATUS_OPTIONS.map((tab) => (
+              <Tab key={tab} label={tab} value={tab} />
+            ))}
+          </Tabs>
 
-    const getTotalPriceByStatus = (status: string) =>
-        sumBy(
-            tableData.filter((item) => item.status === status),
-            'totalPrice'
-        );
+          <Divider />
 
-    const getPercentByStatus = (status: string) =>
-        (getLengthByStatus(status) / tableData.length) * 100;
+          <WarehouseTableToolbar
+            isFiltered={isFiltered}
+            filterName={filterName}
+            filterRole={filterManager}
+            optionsRole={ROLE_OPTIONS}
+            onFilterName={handleFilterName}
+            onFilterRole={handleFilterManager}
+            onResetFilter={handleResetFilter}
+          />
 
-    const TABS = [
-        { value: 'all', label: 'All', color: 'info', count: tableData.length },
-        { value: 'paid', label: 'Paid', color: 'success', count: getLengthByStatus('paid') },
-        { value: 'unpaid', label: 'Unpaid', color: 'warning', count: getLengthByStatus('unpaid') },
-        { value: 'overdue', label: 'Overdue', color: 'error', count: getLengthByStatus('overdue') },
-        { value: 'draft', label: 'Draft', color: 'default', count: getLengthByStatus('draft') },
-    ] as const;
+          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+            <TableSelectedAction
+              dense={dense}
+              numSelected={selected.length}
+              rowCount={tableData.length}
+              onSelectAllRows={(checked) =>
+                onSelectAllRows(
+                  checked,
+                  tableData.map((row) => row.id)
+                )
+              }
+              action={
+                <Tooltip title="Delete">
+                  <IconButton color="primary" onClick={handleOpenConfirm}>
+                    <Iconify icon="eva:trash-2-outline" />
+                  </IconButton>
+                </Tooltip>
+              }
+            />
 
-    const TABLE_HEAD = [
-        { id: 'invoiceNumber', label: 'Client', align: 'left' },
-        { id: 'createDate', label: 'Create', align: 'left' },
-        { id: 'dueDate', label: 'Due', align: 'left' },
-        { id: 'price', label: 'Amount', align: 'center', width: 140 },
-        { id: 'sent', label: 'Sent', align: 'center', width: 140 },
-        { id: 'status', label: 'Status', align: 'left' },
-        { id: '' },
-    ];
-
-    const handleFilterStatus = (event: React.SyntheticEvent<Element, Event>, newValue: string) => {
-        setPage(0);
-        setFilterStatus(newValue);
-    };
-    return (
-        <>
-            <Helmet>
-                <title> Xuất kho</title>
-            </Helmet>
-
-            <Container maxWidth={themeStretch ? false : 'xl'}>
-                <CustomBreadcrumbs
-                    heading="Invoice List"
-                    links={[
-                        {
-                            name: 'Dashboard',
-                            href: PATH_DASHBOARD.root,
-                        },
-                        {
-                            name: 'Invoices',
-                            // href: PATH_DASHBOARD.invoice.root,
-                        },
-                        {
-                            name: 'List',
-                        },
-                    ]}
-                    action={
-                        <Button
-                            to="/dashboard/warehouse-dispatch/add"
-                            component={RouterLink}
-                            variant="contained"
-                            startIcon={<Iconify icon="eva:plus-fill" />}
-                        >
-                            New Invoice
-                        </Button>
-                    }
+            <Scrollbar>
+              <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
+                <TableHeadCustom
+                  order={order}
+                  orderBy={orderBy}
+                  headLabel={TABLE_HEAD}
+                  rowCount={tableData.length}
+                  numSelected={selected.length}
+                  onSort={onSort}
+                  onSelectAllRows={(checked) =>
+                    onSelectAllRows(
+                      checked,
+                      tableData.map((row) => row.id)
+                    )
+                  }
                 />
 
-                <Card sx={{ mb: 5 }}>
-                    <Scrollbar>
-                        <Stack
-                            direction="row"
-                            divider={<Divider orientation="vertical" flexItem sx={{ borderStyle: 'dashed' }} />}
-                            sx={{ py: 2 }}
-                        >
-                            <InvoiceAnalytic
-                                title="Total"
-                                total={tableData.length}
-                                percent={100}
-                                price={sumBy(tableData, 'totalPrice')}
-                                icon="ic:round-receipt"
-                                color={theme.palette.info.main}
-                            />
+                <TableBody>
+                  {isLoading &&
+                    Array(10)
+                      .fill(0)
+                      .map((_, i) => <TableSkeleton key={i} />)}
+                  {!isLoading &&
+                    tableData.map((row, id) => (
+                      <ExportTableRow
+                        key={row.id}
+                        row={row}
+                        selected={selected.includes(row.id)}
+                        onSelectRow={() => onSelectRow(row.id)}
+                        onDeleteRow={() => handleDeleteRow(Number(row.id))}
+                        onEditRow={() => handleEditRow(Number(row.id))}
+                      />
+                    ))}
+                  <TableEmptyRows
+                    height={denseHeight}
+                    emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                  />
+                  <TableNoData isNotFound={isNotFound} />
+                </TableBody>
+              </Table>
+            </Scrollbar>
+          </TableContainer>
 
-                            <InvoiceAnalytic
-                                title="Paid"
-                                total={getLengthByStatus('paid')}
-                                percent={getPercentByStatus('paid')}
-                                price={getTotalPriceByStatus('paid')}
-                                icon="eva:checkmark-circle-2-fill"
-                                color={theme.palette.success.main}
-                            />
+          <TablePaginationCustom
+            count={exportData?.data?.response?.[0]?.total || 0}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={(event, newPage) => {
+              setPage(newPage);
+              setSearchParams({ page: (newPage + 1).toString() });
+            }}
+            onRowsPerPageChange={onChangeRowsPerPage}
+            dense={dense}
+            onChangeDense={onChangeDense}
+          />
+        </Card>
+      </Container>
+    </>
+  );
+};
 
-                            <InvoiceAnalytic
-                                title="Unpaid"
-                                total={getLengthByStatus('unpaid')}
-                                percent={getPercentByStatus('unpaid')}
-                                price={getTotalPriceByStatus('unpaid')}
-                                icon="eva:clock-fill"
-                                color={theme.palette.warning.main}
-                            />
-
-                            <InvoiceAnalytic
-                                title="Overdue"
-                                total={getLengthByStatus('overdue')}
-                                percent={getPercentByStatus('overdue')}
-                                price={getTotalPriceByStatus('overdue')}
-                                icon="eva:bell-fill"
-                                color={theme.palette.error.main}
-                            />
-
-                            <InvoiceAnalytic
-                                title="Draft"
-                                total={getLengthByStatus('draft')}
-                                percent={getPercentByStatus('draft')}
-                                price={getTotalPriceByStatus('draft')}
-                                icon="eva:file-fill"
-                                color={theme.palette.text.secondary}
-                            />
-                        </Stack>
-                    </Scrollbar>
-                </Card>
-
-                <Card>
-                    <Tabs
-                        value={filterStatus}
-                        onChange={handleFilterStatus}
-                        sx={{
-                            px: 2,
-                            bgcolor: 'background.neutral',
-                        }}
-                    >
-                        {TABS.map((tab) => (
-                            <Tab
-                                key={tab.value}
-                                value={tab.value}
-                                label={tab.label}
-                                icon={
-                                    <Label color={tab.color} sx={{ mr: 1 }}>
-                                        {tab.count}
-                                    </Label>
-                                }
-                            />
-                        ))}
-                    </Tabs>
-
-                    <Divider />
-
-                    <WarehouseTableToolbar
-                        isFiltered={isFiltered}
-                        filterName={filterName}
-                        filterService={filterService}
-                        filterEndDate={filterEndDate}
-                        onFilterName={handleFilterName}
-                        optionsService={SERVICE_OPTIONS}
-                        onResetFilter={handleResetFilter}
-                        filterStartDate={filterStartDate}
-                        onFilterService={handleFilterService}
-                        onFilterStartDate={(newValue: SetStateAction<Date | null>) => {
-                            setFilterStartDate(newValue);
-                        }}
-                        onFilterEndDate={(newValue: SetStateAction<Date | null>) => {
-                            setFilterEndDate(newValue);
-                        }}
-                    />
-
-                    <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-                        <TableSelectedAction
-                            dense={dense}
-                            numSelected={selected.length}
-                            rowCount={tableData.length}
-                            onSelectAllRows={(checked) =>
-                                onSelectAllRows(
-                                    checked,
-                                    tableData.map((row) => row.id)
-                                )
-                            }
-                            action={
-                                <Stack direction="row">
-                                    <Tooltip title="Sent">
-                                        <IconButton color="primary">
-                                            <Iconify icon="ic:round-send" />
-                                        </IconButton>
-                                    </Tooltip>
-
-                                    <Tooltip title="Download">
-                                        <IconButton color="primary">
-                                            <Iconify icon="eva:download-outline" />
-                                        </IconButton>
-                                    </Tooltip>
-
-                                    <Tooltip title="Print">
-                                        <IconButton color="primary">
-                                            <Iconify icon="eva:printer-fill" />
-                                        </IconButton>
-                                    </Tooltip>
-
-                                    <Tooltip title="Delete">
-                                        <IconButton color="primary" onClick={handleOpenConfirm}>
-                                            <Iconify icon="eva:trash-2-outline" />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Stack>
-                            }
-                        />
-
-                        <Scrollbar>
-                            <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
-                                <TableHeadCustom
-                                    order={order}
-                                    orderBy={orderBy}
-                                    headLabel={TABLE_HEAD}
-                                    rowCount={tableData.length}
-                                    numSelected={selected.length}
-                                    onSort={onSort}
-                                    onSelectAllRows={(checked) =>
-                                        onSelectAllRows(
-                                            checked,
-                                            tableData.map((row) => row.id)
-                                        )
-                                    }
-                                />
-
-                                <TableBody>
-                                    {dataFiltered
-                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                        .map((row: { id: string; }) => (
-                                            <WarehouseTableRow
-                                                key={row.id}
-                                                row={row}
-                                                selected={selected.includes(row.id)}
-                                                onSelectRow={() => onSelectRow(row.id)}
-                                                onViewRow={() => handleViewRow(row.id)}
-                                                onEditRow={() => handleEditRow(row.id)}
-                                                onDeleteRow={() => handleDeleteRow(row.id)}
-                                            />
-                                        ))}
-
-                                    <TableEmptyRows
-                                        height={denseHeight}
-                                        emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
-                                    />
-
-                                    <TableNoData isNotFound={isNotFound} />
-                                </TableBody>
-                            </Table>
-                        </Scrollbar>
-                    </TableContainer>
-
-                    <TablePaginationCustom
-                        count={dataFiltered.length}
-                        page={page}
-                        rowsPerPage={rowsPerPage}
-                        onPageChange={onChangePage}
-                        onRowsPerPageChange={onChangeRowsPerPage}
-                        //
-                        dense={dense}
-                        onChangeDense={onChangeDense}
-                    />
-                </Card>
-            </Container>
-        </>)
-}
+export default WarehouseDispatchPage;
 
 function applyFilter({
-    inputData,
-    comparator,
-    filterName,
-    filterStatus,
-    filterService,
-    filterStartDate,
-    filterEndDate,
+  inputData,
+  comparator,
+  filterName,
+  filterCode,
+  filterManager,
 }: {
-    inputData: any[];
-    comparator: (a: any, b: any) => number;
-    filterName: string;
-    filterStatus: string;
-    filterService: string;
-    filterStartDate: Date | null;
-    filterEndDate: Date | null;
+  inputData: IWarehouse[];
+  comparator: (a: any, b: any) => number;
+  filterName: string;
+  filterCode: string;
+  filterManager: string;
 }) {
-    const stabilizedThis = inputData.map((el, index) => [el, index] as const);
+  const stabilizedThis = inputData.map((el, index) => [el, index] as const);
 
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) return order;
-        return a[1] - b[1];
-    });
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
 
-    inputData = stabilizedThis.map((el) => el[0]);
+  inputData = stabilizedThis.map((el) => el[0]);
 
-    if (filterName) {
-        inputData = inputData.filter(
-            (invoice) =>
-                invoice.invoiceNumber.toLowerCase().indexOf(filterName.toLowerCase()) !== -1 ||
-                invoice.invoiceTo.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
-        );
-    }
+  if (filterName) {
+    inputData = inputData.filter(
+      (warehosue) => warehosue.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+    );
+  }
 
-    if (filterStatus !== 'all') {
-        inputData = inputData.filter((invoice) => invoice.status === filterStatus);
-    }
+  if (filterCode !== 'all') {
+    inputData = inputData.filter((warehosue) => warehosue.code === filterCode);
+  }
 
-    if (filterService !== 'all') {
-        inputData = inputData.filter((invoice) =>
-            invoice.items.some((c: { service: string; }) => c.service === filterService)
-        );
-    }
+  if (filterManager !== 'all') {
+    inputData = inputData.filter((warehosue) => warehosue.manager_by === filterManager);
+  }
 
-    if (filterStartDate && filterEndDate) {
-        inputData = inputData.filter(
-            (invoice) =>
-                fTimestamp(invoice.createDate) >= fTimestamp(filterStartDate) &&
-                fTimestamp(invoice.createDate) <= fTimestamp(filterEndDate)
-        );
-    }
-
-    return inputData;
+  return inputData;
 }

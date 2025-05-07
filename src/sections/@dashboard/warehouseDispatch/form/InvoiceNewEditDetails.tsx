@@ -1,55 +1,52 @@
 import sum from 'lodash/sum';
 import { useCallback, useEffect } from 'react';
-// form
 import { useFormContext, useFieldArray } from 'react-hook-form';
-// @mui
-import { Box, Stack, Button, Divider, Typography, InputAdornment, MenuItem } from '@mui/material';
-// utils
-import { fNumber, fCurrency } from '../../../../utils/formatNumber';
-// @types
-// import { IInvoiceItem } from '../../../../@types/invoice';
-// components
+import {
+  Box,
+  Stack,
+  Button,
+  Divider,
+  Typography,
+  InputAdornment,
+  MenuItem,
+  Avatar,
+} from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
+
+import { fetchAllSignboard } from 'src/apis/signboard.api';
+import { fCurrency } from '../../../../utils/formatNumber';
 import Iconify from '../../../../components/iconify';
 import { RHFSelect, RHFTextField } from '../../../../components/hook-form';
-
-// ----------------------------------------------------------------------
-
-const SERVICE_OPTIONS = [
-  { id: 1, name: 'full stack development', price: 90.99 },
-  { id: 2, name: 'backend development', price: 80.99 },
-  { id: 3, name: 'ui design', price: 70.99 },
-  { id: 4, name: 'ui/ux design', price: 60.99 },
-  { id: 5, name: 'front end development', price: 40.99 },
-];
-
-// ----------------------------------------------------------------------
 
 export default function InvoiceNewEditDetails() {
   const { control, setValue, watch, resetField } = useFormContext();
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'items',
+    name: 'details',
   });
 
   const values = watch();
 
-  const totalOnRow = values.items.map((item: any) => item.quantity * item.price);
+  const totalOnRow = values.details.map((item: any) => item.quantity * item.unit_price);
 
-  const totalPrice = sum(totalOnRow) - values.discount + values.taxes;
+  const paid_amount = sum(totalOnRow) + (sum(totalOnRow) * (values.vat || 0)) / 100;
 
   useEffect(() => {
-    setValue('totalPrice', totalPrice);
-  }, [setValue, totalPrice]);
+    setValue('paid_amount', paid_amount);
+  }, [setValue, paid_amount]);
+
+  const { data: signboard } = useQuery({
+    queryKey: ['allSignboard'],
+    queryFn: () => fetchAllSignboard(),
+  });
 
   const handleAdd = () => {
     append({
-      title: '',
-      description: '',
-      service: '',
+      signboard_id: '',
+      signboard_name: '',
       quantity: 1,
-      price: 0,
-      total: 0,
+      unit_price: 0,
     });
   };
 
@@ -59,9 +56,8 @@ export default function InvoiceNewEditDetails() {
 
   const handleClearService = useCallback(
     (index: number) => {
-      resetField(`items[${index}].quantity`);
-      resetField(`items[${index}].price`);
-      resetField(`items[${index}].total`);
+      resetField(`details[${index}].quantity`);
+      resetField(`details[${index}].unit_price`);
     },
     [resetField]
   );
@@ -69,67 +65,45 @@ export default function InvoiceNewEditDetails() {
   const handleSelectService = useCallback(
     (index: number, option: string) => {
       setValue(
-        `items[${index}].price`,
-        SERVICE_OPTIONS.find((service) => service.name === option)?.price
+        `details[${index}].unit_price`,
+        signboard?.find((service) => service.id === option)?.selling_price
       );
       setValue(
-        `items[${index}].total`,
-        values.items.map((item: any) => item.quantity * item.price)[index]
+        `details[${index}].signboard_name`,
+        signboard?.find((service) => service.id === option)?.name
       );
     },
-    [setValue, values.items]
+    [setValue, values.details]
   );
 
   const handleChangeQuantity = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
-      setValue(`items[${index}].quantity`, Number(event.target.value));
-      setValue(
-        `items[${index}].total`,
-        values.items.map((item: any) => item.quantity * item.price)[index]
-      );
+      setValue(`details[${index}].quantity`, Number(event.target.value));
     },
-    [setValue, values.items]
+    [setValue, values.details]
   );
 
   const handleChangePrice = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
-      setValue(`items[${index}].price`, Number(event.target.value));
-      setValue(
-        `items[${index}].total`,
-        values.items.map((item: any) => item.quantity * item.price)[index]
-      );
+      setValue(`details[${index}].unit_price`, Number(event.target.value));
     },
-    [setValue, values.items]
+    [setValue, values.details]
   );
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" sx={{ color: 'text.disabled', mb: 3 }}>
-        Details:
+        Sản phẩm:
       </Typography>
 
       <Stack divider={<Divider flexItem sx={{ borderStyle: 'dashed' }} />} spacing={3}>
         {fields.map((item, index) => (
           <Stack key={item.id} alignItems="flex-end" spacing={1.5}>
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ width: 1 }}>
-              <RHFTextField
-                size="small"
-                name={`items[${index}].title`}
-                label="Title"
-                InputLabelProps={{ shrink: true }}
-              />
-
-              <RHFTextField
-                size="small"
-                name={`items[${index}].description`}
-                label="Description"
-                InputLabelProps={{ shrink: true }}
-              />
-
               <RHFSelect
-                name={`items[${index}].service`}
+                name={`details[${index}].signboard_id`}
                 size="small"
-                label="Service"
+                label="Sản phẩm"
                 InputLabelProps={{ shrink: true }}
                 SelectProps={{
                   native: false,
@@ -141,7 +115,7 @@ export default function InvoiceNewEditDetails() {
                   sx: { textTransform: 'capitalize' },
                 }}
                 sx={{
-                  maxWidth: { md: 160 },
+                  maxWidth: { md: 400 },
                 }}
               >
                 <MenuItem
@@ -160,11 +134,11 @@ export default function InvoiceNewEditDetails() {
 
                 <Divider />
 
-                {SERVICE_OPTIONS.map((option) => (
+                {signboard?.map((option) => (
                   <MenuItem
                     key={option.id}
-                    value={option.name}
-                    onClick={() => handleSelectService(index, option.name)}
+                    value={option.id}
+                    onClick={() => handleSelectService(index, option.id)}
                     sx={{
                       mx: 1,
                       my: 0.5,
@@ -175,7 +149,10 @@ export default function InvoiceNewEditDetails() {
                       '&:last-of-type': { mb: 0 },
                     }}
                   >
-                    {option.name}
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                      <Avatar alt={option.name} src={option.image} />
+                      {option.name}
+                    </Box>
                   </MenuItem>
                 ))}
               </RHFSelect>
@@ -183,38 +160,25 @@ export default function InvoiceNewEditDetails() {
               <RHFTextField
                 size="small"
                 type="number"
-                name={`items[${index}].quantity`}
+                name={`details[${index}].quantity`}
                 label="Quantity"
                 placeholder="0"
                 onChange={(event) => handleChangeQuantity(event, index)}
                 InputLabelProps={{ shrink: true }}
-                sx={{ maxWidth: { md: 96 } }}
+                sx={{ maxWidth: { md: 150 } }}
               />
 
               <RHFTextField
                 size="small"
                 type="number"
-                name={`items[${index}].price`}
+                name={`details[${index}].unit_price`}
                 label="Price"
                 placeholder="0"
                 onChange={(event) => handleChangePrice(event, index)}
                 InputProps={{
                   startAdornment: <InputAdornment position="start">$</InputAdornment>,
                 }}
-                sx={{ maxWidth: { md: 96 } }}
-              />
-
-              <RHFTextField
-                disabled
-                size="small"
-                name={`items[${index}].total`}
-                label="Total"
-                placeholder="0"
-                value={fNumber(totalOnRow[index])}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                }}
-                sx={{ maxWidth: { md: 96 } }}
+                sx={{ maxWidth: { md: 150 } }}
               />
             </Stack>
 
@@ -254,17 +218,10 @@ export default function InvoiceNewEditDetails() {
         >
           <RHFTextField
             size="small"
-            label="Discount"
-            name="discount"
-            onChange={(event) => setValue('discount', Number(event.target.value))}
-            sx={{ maxWidth: { md: 200 } }}
-          />
-
-          <RHFTextField
-            size="small"
-            label="Taxes"
-            name="taxes"
-            onChange={(event) => setValue('taxes', Number(event.target.value))}
+            label="VAT (%)"
+            name="vat"
+            defaultValue={0}
+            onChange={(event) => setValue('vat', Number(event.target.value))}
             sx={{ maxWidth: { md: 200 } }}
           />
         </Stack>
@@ -279,25 +236,18 @@ export default function InvoiceNewEditDetails() {
         </Stack>
 
         <Stack direction="row" justifyContent="flex-end">
-          <Typography>Discount :</Typography>
+          <Typography>VAT :</Typography>
           <Typography
-            sx={{ textAlign: 'right', width: 120, ...(values.discount && { color: 'error.main' }) }}
+            sx={{ textAlign: 'right', width: 120, ...(values.vat && { color: 'error.main' }) }}
           >
-            {values.discount ? `- ${fCurrency(values.discount)}` : '-'}
-          </Typography>
-        </Stack>
-
-        <Stack direction="row" justifyContent="flex-end">
-          <Typography>Taxes :</Typography>
-          <Typography sx={{ textAlign: 'right', width: 120 }}>
-            {values.taxes ? fCurrency(values.taxes) : '-'}
+            {values.vat ? `${values.vat} %` : '0 %'}
           </Typography>
         </Stack>
 
         <Stack direction="row" justifyContent="flex-end">
           <Typography variant="h6">Total price :</Typography>
           <Typography variant="h6" sx={{ textAlign: 'right', width: 120 }}>
-            {fCurrency(totalPrice)}
+            {fCurrency(paid_amount)}
           </Typography>
         </Stack>
       </Stack>
