@@ -1,8 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
+import { PATH_DASHBOARD } from '../routes/paths';
+import { IWarehouse } from 'src/types/warehosue.type';
+import { AuthContext } from 'src/auth/JwtContext';
+import { usePermission } from 'src/hooks/usePermisson';
+// Section
+import { WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
+import { ProjectTableRow } from 'src/sections/@dashboard/project';
+// Mui
 import {
   Tab,
   Tabs,
@@ -16,9 +23,12 @@ import {
   IconButton,
   TableContainer,
 } from '@mui/material';
-
-import { useSettingsContext } from 'src/components/settings';
-import { PATH_DASHBOARD } from '../routes/paths';
+// Api 
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { deleteProject, getAllProject } from 'src/apis/projects.api';
+// Locales
+import { useLocales } from 'src/locales';
+// Components
 import {
   useTable,
   getComparator,
@@ -33,12 +43,7 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-import { WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
-import { IWarehouse } from 'src/types/warehosue.type';
-import { AuthContext } from 'src/auth/JwtContext';
-import { usePermission } from 'src/hooks/usePermisson';
-import { deleteProject, getAllProject } from 'src/apis/projects.api';
-import { ProjectTableRow } from 'src/sections/@dashboard/project';
+import { useSettingsContext } from 'src/components/settings';
 
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -83,6 +88,9 @@ const ProjectsPage = () => {
   } = useTable({ defaultRowsPerPage: 10 });
 
   const { themeStretch } = useSettingsContext();
+
+  const { translate } = useLocales();
+
   const { enqueueSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
@@ -94,11 +102,15 @@ const ProjectsPage = () => {
   const [filterCode, setFilterCode] = useState('all');
 
   const [openConfirm, setOpenConfirm] = useState(false);
+
   const context = useContext(AuthContext);
+
   const { hasPermission } = usePermission(context?.userRole, context?.permissions || []);
 
   const [filterManager, setFilterManager] = useState('all');
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const page2 = searchParams.get('page') || '1';
 
   const {
@@ -186,16 +198,16 @@ const ProjectsPage = () => {
   return (
     <>
       <Helmet>
-        <title> Dự án | PMC</title>
+        <title> {translate('ProjectPage')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Dự án"
+          heading={translate('Project')}
           links={[
-            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Dự án', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh sách dự án' },
+            { name: `${translate('Home')}`, href: PATH_DASHBOARD.root },
+            { name: `${translate('Projects')}`, href: PATH_DASHBOARD.project },
+            { name: `${translate('ListProjects')}` },
           ]}
           action={
             <>
@@ -206,7 +218,7 @@ const ProjectsPage = () => {
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  Tạo dự án
+                  {translate('CreateNewProject')}
                 </Button>
               )}
             </>

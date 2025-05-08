@@ -7,27 +7,29 @@ import { Button, Typography } from '@mui/material';
 import { MotionContainer, varBounce } from '../components/animate';
 // assets
 import { PageNotFoundIllustration } from '../assets/illustrations';
-
+// Locales
+import { useLocales } from '../locales';
 // ----------------------------------------------------------------------
 
 export default function Page404() {
+  const { translate } = useLocales();
+
   return (
     <>
       <Helmet>
-        <title> 404 Page Not Found | Minimal UI</title>
+        <title> {translate('404PageNotFound')} | Minimal UI</title>
       </Helmet>
 
       <MotionContainer>
         <m.div variants={varBounce().in}>
           <Typography variant="h3" paragraph>
-            Sorry, page not found!
+            {translate('SorryPageNotFound')}
           </Typography>
         </m.div>
 
         <m.div variants={varBounce().in}>
           <Typography sx={{ color: 'text.secondary' }}>
-            Sorry, we couldn’t find the page you’re looking for. Perhaps you’ve mistyped the URL? Be
-            sure to check your spelling.
+            {translate('DescriptionPageNotFound')}
           </Typography>
         </m.div>
 
@@ -41,7 +43,7 @@ export default function Page404() {
         </m.div>
 
         <Button to="/" component={RouterLink} size="large" variant="contained">
-          Go to Home
+          {translate('BackToHome')}
         </Button>
       </MotionContainer>
     </>

@@ -7,11 +7,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Link, Stack, Alert, IconButton, InputAdornment } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // auth
-import { useAuthContext } from '../../auth/useAuthContext';
+import { useAuthContext } from 'src/auth/useAuthContext';
 // components
-import Iconify from '../../components/iconify';
-import FormProvider, { RHFTextField } from '../../components/hook-form';
-
+import Iconify from 'src/components/iconify';
+import FormProvider, { RHFTextField } from 'src/components/hook-form';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -22,12 +23,12 @@ type FormValuesProps = {
 
 export default function AuthLoginForm() {
   const { login, initialize } = useAuthContext();
-
+  const { translate } = useLocales();
   const [showPassword, setShowPassword] = useState(false);
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().email('Email must be a valid email address').required('Email is required'),
-    password: Yup.string().required('Password is required'),
+    email: Yup.string().email(`${translate('EmailMustBeAValidEmailAddress')}`).required('Email is required'),
+    password: Yup.string().required(`${translate('PasswordIsRequired')}`),
   });
 
   const defaultValues = {
@@ -85,7 +86,7 @@ export default function AuthLoginForm() {
 
       <Stack alignItems="flex-end" sx={{ my: 2 }}>
         <Link variant="body2" color="inherit" underline="always">
-          Forgot password?
+          {translate('ForgotPassword')}?
         </Link>
       </Stack>
 
@@ -105,7 +106,7 @@ export default function AuthLoginForm() {
           },
         }}
       >
-        Login
+        {translate('Login')}
       </LoadingButton>
     </FormProvider>
   );

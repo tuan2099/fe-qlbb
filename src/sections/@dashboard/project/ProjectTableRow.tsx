@@ -16,6 +16,8 @@ import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -34,7 +36,7 @@ export default function ProjectTableRow({
   onDeleteRow,
 }: Props) {
   const [openConfirm, setOpenConfirm] = useState(false);
-
+  const { translate } = useLocales();
   const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
 
   const handleOpenConfirm = () => {
@@ -99,7 +101,7 @@ export default function ProjectTableRow({
             sx={{ color: 'error.main' }}
           >
             <Iconify icon="eva:trash-2-outline" />
-            Xoá
+            {translate('Delete')}
           </MenuItem>
         )}
         <MenuItem
@@ -109,7 +111,7 @@ export default function ProjectTableRow({
           }}
         >
           <Iconify icon="eva:edit-fill" />
-          Chỉnh sửa
+          {translate('Edit')}
         </MenuItem>
       </MenuPopover>
 
@@ -120,7 +122,7 @@ export default function ProjectTableRow({
         content="Are you sure want to delete?"
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
-            Xoá
+            {translate('Delete')}
           </Button>
         }
       />

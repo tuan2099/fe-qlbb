@@ -10,12 +10,12 @@ import {
   InputAdornment,
 } from '@mui/material';
 // @types
-// import { IInvoiceAddress } from '../../../../@types/invoice';
+// import { IInvoiceAddress } from 'src/@types/invoice';
 // components
-import Iconify from '../../../../components/iconify';
-import Scrollbar from '../../../../components/scrollbar';
-import SearchNotFound from '../../../../components/search-not-found';
-
+import Iconify from 'src/components/iconify';
+import Scrollbar from 'src/components/scrollbar';
+import SearchNotFound from 'src/components/search-not-found';
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -34,7 +34,7 @@ export default function InvoiceAddressListDialog({
   addressOptions,
 }: Props) {
   const [searchAddress, setSearchAddress] = useState('');
-
+  const { translate } = useLocales();
   const dataFiltered = applyFilter(addressOptions, searchAddress);
 
   const isNotFound = !dataFiltered.length && !!searchAddress;
@@ -57,14 +57,14 @@ export default function InvoiceAddressListDialog({
         justifyContent="space-between"
         sx={{ pt: 2.5, px: 3 }}
       >
-        <Typography variant="h6"> Chọn nhà cung cấp </Typography>
+        <Typography variant="h6">{translate('SelectASupplier')}</Typography>
 
         <Button
           size="small"
           startIcon={<Iconify icon="eva:plus-fill" />}
           sx={{ alignSelf: 'flex-end' }}
         >
-          Tạo mới
+          {translate('CreateNew')}
         </Button>
       </Stack>
 
@@ -72,7 +72,7 @@ export default function InvoiceAddressListDialog({
         <TextField
           value={searchAddress}
           onChange={handleSearchAddress}
-          placeholder="Search..."
+          placeholder={translate('Search')}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

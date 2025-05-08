@@ -10,24 +10,21 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchAllUser } from 'src/apis/user.api';
 import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
 import RHFSignature from 'src/components/hook-form/RHFSignature';
-
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = ['Chưa thanh toán', 'Đã thanh toán'];
-const IMPORT_TYPE_OPTIONS = ['Mới', 'Cũ'];
-
-// ----------------------------------------------------------------------
 
 export default function InvoiceNewEditStatusDate() {
   const { control, watch } = useFormContext();
-
+  const { translate } = useLocales();
   const { data: userData } = useQuery({
     queryKey: ['allUser'],
     queryFn: () => fetchAllUser(),
   });
 
   const values = watch();
-
+  const STATUS_OPTIONS = ['Chưa thanh toán', 'Đã thanh toán'];
+  const IMPORT_TYPE_OPTIONS = ['Mới', 'Cũ'];
   return (
     <Stack
       spacing={2}
@@ -36,22 +33,22 @@ export default function InvoiceNewEditStatusDate() {
     >
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
-          <RHFSignature name="signature_receiver" label="Chữ ký người nhận" />
+          <RHFSignature name="signature_receiver" label={translate('SignatureReceiver')} />
         </Grid>
         <Grid item xs={12} md={4}>
-          <RHFSignature name="signature_deliverer" label="Chữ ký người giao" />
+          <RHFSignature name="signature_deliverer" label={translate('SignatureDeliverer')} />
         </Grid>
         <Grid item xs={12} md={4}>
-          <RHFSignature name="signature_storekeeper" label="Chữ ký thủ kho" />
+          <RHFSignature name="signature_storekeeper" label={translate('SignatureStorekeeper')} />
         </Grid>
         <Grid item xs={12} md={4}>
-          <RHFSignature name="signature_accountant" label="Chữ ký kế toán" />
+          <RHFSignature name="signature_accountant" label={translate('SignatureAccountant')} />
         </Grid>
         <Grid item xs={12} md={4}>
           <RHFSelect
             fullWidth
             name="receiver_id"
-            label="Người nhận hàng"
+            label={translate('Consignee')}
             defaultValue={''}
             InputLabelProps={{ shrink: true }}
             SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
@@ -106,7 +103,7 @@ export default function InvoiceNewEditStatusDate() {
           <RHFSelect
             fullWidth
             name="import_type"
-            label="Loại nhập"
+            label={translate('ImportType')}
             InputLabelProps={{ shrink: true }}
             SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
           >
@@ -130,7 +127,7 @@ export default function InvoiceNewEditStatusDate() {
           </RHFSelect>
         </Grid>
         <Grid item xs={12} md={4}>
-          <RHFDatePicker name="due_date" label="Hạn thanh toán" />
+          <RHFDatePicker name="due_date" label={translate('DueDate')} />
         </Grid>
       </Grid>
     </Stack>

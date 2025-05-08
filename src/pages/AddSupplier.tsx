@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Container, Typography, Stack, MenuItem } from '@mui/material';
+import { Container, Typography, Stack } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
@@ -8,12 +8,11 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
-
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import { useLocales } from 'src/locales';
+import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import LoadingScreen from 'src/components/loading-screen';
 import { useSettingsContext } from '../components/settings';
 import { getAllUser } from 'src/apis/user.api';
-import { addWarehouse, getWarehouseDetail, updateWarehouse } from 'src/apis/warehouse.api';
 import { AuthContext } from 'src/auth/JwtContext';
 import { addSupplier, getSupplier, updateSupplier } from 'src/apis/supplier.api';
 
@@ -41,12 +40,18 @@ const schema = yup.object().shape({
 
 const AddSupplier = () => {
   const { themeStretch } = useSettingsContext();
+
   const { enqueueSnackbar } = useSnackbar();
+
   const navigate = useNavigate();
+
   const { id } = useParams();
+
   const isAddMode = !Boolean(id);
 
   const context = useContext(AuthContext);
+
+  const { translate } = useLocales();
 
   const userList = useQuery({
     queryKey: ['user'],
@@ -99,7 +104,7 @@ const AddSupplier = () => {
     onSuccess: () => {
       reset();
       isAddMode ? reset() : navigate('/dashboard/supplier');
-      enqueueSnackbar(isAddMode ? 'Tạo thành công' : 'Cập nhập thành công', { variant: 'success' });
+      enqueueSnackbar(isAddMode ? `${translate('CreateNewSupplierSuccess')}` : `${translate('UpdateSupplierSuccess')}`, { variant: 'success' });
     },
     onError: (err) => {
       enqueueSnackbar(err.message, { variant: 'error' });
@@ -110,12 +115,12 @@ const AddSupplier = () => {
     <>
       {userList.isLoading && <LoadingScreen />}
       <Helmet>
-        <title> Supplier Page | PMC</title>
+        <title> {translate('SupplierPage')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          {isAddMode ? 'Add Supplier' : 'Update Supplier'}
+          {isAddMode ? `${translate('CreateNewSupplier')}` : `${translate('UpdateSupplier')}`}
         </Typography>
 
         <FormProvider
@@ -123,16 +128,16 @@ const AddSupplier = () => {
           onSubmit={handleSubmit((data) => handleSubmitForm.mutate(data))}
         >
           <Stack spacing={3} paddingY={2}>
-            <RHFTextField name="name" label="Name" />
-            <RHFTextField name="phone" label="Phone" />
-            <RHFTextField name="email" label="Email" />
-            <RHFTextField name="address" label="Address" />
-            <RHFTextField name="region" label="Region" />
-            <RHFTextField name="branch" label="Branch" />
-            <RHFTextField name="status" label="Status" />
-            <RHFTextField name="note" label="Note" />
+            <RHFTextField name="name" label={translate('SupplierName')} />
+            <RHFTextField name="phone" label={translate('SupplierPhone')} />
+            <RHFTextField name="email" label={translate('SupplierEmail')} />
+            <RHFTextField name="address" label={translate('SupplierAddress')} />
+            <RHFTextField name="region" label={translate('SupplierRegion')} />
+            <RHFTextField name="branch" label={translate('SupplierBranch')} />
+            <RHFTextField name="status" label={translate('SupplierStatus')} />
+            <RHFTextField name="note" label={translate('SupplierNote')} />
             <LoadingButton loading={handleSubmitForm.isPending} type="submit" variant="contained">
-              {isAddMode ? ' Tạo mới' : 'Cập nhập'}
+              {isAddMode ? `${translate('CreateNewSupplier')}` : `${translate('UpdateSupplier')}`}
             </LoadingButton>
           </Stack>
         </FormProvider>

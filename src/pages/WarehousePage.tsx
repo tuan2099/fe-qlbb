@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
 // @mui
 import {
   Tab,
@@ -38,13 +37,13 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 
-// utils
-import { StorageTableColumns } from 'src/utils/column';
 // sections
 import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
 import { IWarehouse } from 'src/types/warehosue.type';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -87,6 +86,8 @@ export default function WarehousePage() {
 
   const { themeStretch } = useSettingsContext();
 
+  const { translate } = useLocales();
+
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState<IWarehouse[]>([]);
@@ -96,11 +97,15 @@ export default function WarehousePage() {
   const [filterCode, setFilterCode] = useState('all');
 
   const [openConfirm, setOpenConfirm] = useState(false);
+
   const context = useContext(AuthContext)
+
   const { hasPermission } = usePermission(context?.userRole, context?.permissions || [])
 
   const [filterManager, setFilterManager] = useState('all');
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const page2 = searchParams.get('page') || '1';
 
   const {
@@ -205,16 +210,16 @@ export default function WarehousePage() {
   return (
     <>
       <Helmet>
-        <title>Kho | PMC</title>
+        <title>{translate('Warehouse')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Kho hàng"
+          heading={translate('Warehouse')}
           links={[
-            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Kho', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh sách kho' },
+            { name: `${translate('Home')}`, href: PATH_DASHBOARD.root },
+            { name: `${translate('Warehouse')}`, href: PATH_DASHBOARD.warehouse },
+            { name: `${translate('WarehouseList')}` },
           ]}
           action={
             <>
@@ -225,7 +230,7 @@ export default function WarehousePage() {
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  Tạo kho mới
+                  {translate('CreateNewWarehouse')}
                 </Button>}
             </>
           }

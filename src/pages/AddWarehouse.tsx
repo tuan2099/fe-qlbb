@@ -1,20 +1,24 @@
 import { useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Container, Typography, Stack, MenuItem } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LoadingButton } from '@mui/lab';
-
-import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+// component
+import { AuthContext } from 'src/auth/JwtContext';
 import LoadingScreen from 'src/components/loading-screen';
+import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import { useSettingsContext } from '../components/settings';
+// api
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getAllUser } from 'src/apis/user.api';
 import { addWarehouse, getWarehouseDetail, updateWarehouse } from 'src/apis/warehouse.api';
-import { AuthContext } from 'src/auth/JwtContext';
+// locales
+import { useLocales } from 'src/locales';
+// Mui
+import { Container, Typography, Stack, MenuItem } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 
 type FormValue = {
   name: string;
@@ -22,20 +26,26 @@ type FormValue = {
   note: string;
 };
 
-const schema = yup.object().shape({
-  name: yup.string().required('Tên không được để trống'),
-  manager_id: yup.string().required('Tên không được để trống'),
-  note: yup.string().required('Tên không được để trống'),
-});
-
 const AddWarehouse = () => {
   const { themeStretch } = useSettingsContext();
+
+  const { translate } = useLocales();
+
   const { enqueueSnackbar } = useSnackbar();
+
   const navigate = useNavigate();
+
   const { id } = useParams();
+
   const isAddMode = !Boolean(id);
 
   const context = useContext(AuthContext);
+
+  const schema = yup.object().shape({
+    name: yup.string().required('Tên không được để trống'),
+    manager_id: yup.string().required('Tên không được để trống'),
+    note: yup.string().required('Tên không được để trống'),
+  });
 
   const userList = useQuery({
     queryKey: ['user'],
@@ -78,7 +88,7 @@ const AddWarehouse = () => {
     onSuccess: () => {
       reset();
       isAddMode ? reset() : navigate('/dashboard/warehouse');
-      enqueueSnackbar(isAddMode ? 'Tạo thành công' : 'Cập nhập thành công', { variant: 'success' });
+      enqueueSnackbar(isAddMode ? `${translate('CreateNewWarehosueSuccess')}` : `${translate('UpdateNewWarehosueSuccess')}`, { variant: 'success' });
     },
     onError: (err) => {
       enqueueSnackbar(err.message, { variant: 'error' });
@@ -89,12 +99,12 @@ const AddWarehouse = () => {
     <>
       {userList.isLoading && <LoadingScreen />}
       <Helmet>
-        <title> Warehouse Page | PMC</title>
+        <title> {translate('WarehousePage')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          Add Warehouse
+          {translate('WarehousePage')}
         </Typography>
 
         <FormProvider
@@ -102,9 +112,9 @@ const AddWarehouse = () => {
           onSubmit={handleSubmit((data) => handleSubmitForm.mutate(data))}
         >
           <Stack spacing={3} paddingY={2}>
-            <RHFTextField name="name" label="Name" />
-            <RHFTextField name="note" label="Note" />
-            <RHFSelect name="manager_id" label="Manage By" SelectProps={{ native: false }}>
+            <RHFTextField name="name" label={translate('WarehouseName')} />
+            <RHFTextField name="note" label={translate('WarehouseNote')} />
+            <RHFSelect name="manager_id" label={translate('WarehouseManageUser')} SelectProps={{ native: false }}>
               {userList &&
                 userList?.data?.data.response[0].data.map((item: any) => (
                   <MenuItem key={item.id} value={item.id.toString()}>
@@ -114,7 +124,7 @@ const AddWarehouse = () => {
             </RHFSelect>
 
             <LoadingButton loading={handleSubmitForm.isPending} type="submit" variant="contained">
-              {isAddMode ? ' Tạo mới' : 'Cập nhập'}
+              {isAddMode ? `${translate('CreateNewWarehosue')}` : `${translate('UpdateNewWarehosue')}`}
             </LoadingButton>
           </Stack>
         </FormProvider>

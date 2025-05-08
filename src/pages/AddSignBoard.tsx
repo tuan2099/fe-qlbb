@@ -8,19 +8,23 @@ import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { Box, Grid, Card, Stack, Typography, Container } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+// component
 import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
+import FormProvider, { RHFSelect, RHFTextField, RHFUploadAvatar } from 'src/components/hook-form';
+import { CustomFile } from 'src/components/upload';
+import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
+import { useSettingsContext } from 'src/components/settings';
+import LoadingScreen from 'src/components/loading-screen';
+// api
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { uploadAvatar } from 'src/apis/user.api';
-import { useSnackbar } from 'notistack';
-import { CustomFile } from 'src/components/upload';
-import FormProvider, { RHFSelect, RHFTextField, RHFUploadAvatar } from 'src/components/hook-form';
-import { fData } from 'src/utils/formatNumber';
-import CustomBreadcrumbs from 'src/components/custom-breadcrumbs';
-import { PATH_DASHBOARD } from 'src/routes/paths';
-import { useSettingsContext } from 'src/components/settings';
-import { useParams } from 'react-router';
 import { addSignboard, getSignboard, updateSignboard } from 'src/apis/signboard.api';
-import LoadingScreen from 'src/components/loading-screen';
+// locales 
+import { useLocales } from 'src/locales';
+import { useSnackbar } from 'notistack';
+import { fData } from 'src/utils/formatNumber';
+import { PATH_DASHBOARD } from 'src/routes/paths';
+import { useParams } from 'react-router';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
 
@@ -44,9 +48,13 @@ type FormValuesProps = {
 
 export default function AddSignBoard() {
   const { enqueueSnackbar } = useSnackbar();
+
   const { themeStretch } = useSettingsContext();
+
   const { id } = useParams();
+
   const isAddMode = !Boolean(id);
+
   const [isUpdate, setIsUpdate] = useState(false);
 
   const context = useContext(AuthContext);
@@ -205,7 +213,6 @@ export default function AddSignBoard() {
           </Helmet>
 
           <Container maxWidth={themeStretch ? false : 'xl'}>
-            {hasPermission('signboard_edit') && <p>Bạn có quyền edit </p>}
             <CustomBreadcrumbs
               heading="Tùy chỉnh sản phẩm"
               links={[

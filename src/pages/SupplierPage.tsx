@@ -43,6 +43,8 @@ import { ISupplier } from 'src/types/supplier.type';
 import { SupplierTableRow, SupplierTableToolbar } from '../sections/@dashboard/supplier';
 // routes
 import { PATH_DASHBOARD } from '../routes/paths';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
@@ -101,8 +103,12 @@ const SupplierPage = () => {
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const [filterManager, setFilterManager] = useState('all');
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const page2 = searchParams.get('page') || '1';
+
+  const { translate } = useLocales();
 
   const {
     data: SupplierData,
@@ -112,8 +118,6 @@ const SupplierPage = () => {
     queryKey: ['supplier', page2],
     queryFn: () => getAllSupplier({ page: page2 }),
   });
-
-  console.log(SupplierData)
 
   useEffect(() => {
     if (SupplierData?.data?.response?.[0]) {
@@ -208,16 +212,16 @@ const SupplierPage = () => {
   return (
     <>
       <Helmet>
-        <title> Nhà cung cấp | PMC</title>
+        <title> {translate('Suppliers')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Kho hàng"
+          heading={translate('Suppliers')}
           links={[
-            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Nhà cung cấp', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh sách nhà cung cấp' },
+            { name: `${translate('Home')}`, href: PATH_DASHBOARD.root },
+            { name: `${translate('Suppliers')}`, href: PATH_DASHBOARD.supplier },
+            { name: `${translate('SuppliersList')}` },
           ]}
           action={
             <Button
@@ -226,7 +230,7 @@ const SupplierPage = () => {
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
             >
-              Tạo Nhà Cung Cấp
+              {translate('CreateSuppliers')}
             </Button>
           }
         />

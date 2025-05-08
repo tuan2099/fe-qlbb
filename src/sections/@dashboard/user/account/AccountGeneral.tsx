@@ -10,13 +10,10 @@ import { LoadingButton } from '@mui/lab';
 import { useAuthContext } from '../../../../auth/useAuthContext';
 // utils
 import { fData } from '../../../../utils/formatNumber';
-// assets
-import { countries } from '../../../../assets/data';
 // components
 import { CustomFile } from '../../../../components/upload';
 import { useSnackbar } from '../../../../components/snackbar';
 import FormProvider, {
-  RHFSwitch,
   RHFSelect,
   RHFTextField,
   RHFUploadAvatar,
@@ -26,6 +23,9 @@ import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getRoles } from 'src/apis/role.api';
 import { updateProfile, updateUser, uploadAvatar } from 'src/apis/user.api';
+// locales
+import { useLocales } from 'src/locales';
+// ----------------------------------------------------------------------
 
 type FormValuesProps = {
   photoURL?: CustomFile | string | null;
@@ -40,18 +40,18 @@ type FormValuesProps = {
 export default function AccountGeneral() {
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuthContext();
-
+  const { translate } = useLocales();
   const { data: RoleData } = useQuery({
     queryKey: ['roles'],
     queryFn: () => getRoles({ page: '1' }),
   });
 
   const UpdateUserSchema = Yup.object().shape({
-    phone: Yup.string().required('Phone is required'),
-    gender: Yup.string().required('Gender is required'),
-    position: Yup.string().required('Position is required'),
-    birthday: Yup.string().required('Birthday is required'),
-    name: Yup.string().required('Name is required'),
+    phone: Yup.string().required(`${translate('PhoneIsRequired')}`),
+    gender: Yup.string().required(`${translate('GenderIsRequired')}`),
+    position: Yup.string().required(`${translate('PositionIsRequired')}`),
+    birthday: Yup.string().required(`${translate('BirthdayIsRequired')}`),
+    name: Yup.string().required(`${translate('NameIsRequired')}`),
   });
 
   const defaultValues = {
@@ -97,7 +97,7 @@ export default function AccountGeneral() {
       return updateProfile(newData);
     },
     onSuccess: () => {
-      enqueueSnackbar('Thông tin đã được cập nhập.', { variant: 'success' });
+      enqueueSnackbar(`${translate('ChangeUserInformationSuccessfully')}`, { variant: 'success' });
     },
     onError: (err) => enqueueSnackbar(err.message, { variant: 'error' }),
   });
@@ -108,7 +108,7 @@ export default function AccountGeneral() {
       return uploadAvatar(data);
     },
     onError: () => {
-      enqueueSnackbar('Có lỗi xảy ra ! Vui lòng thử lại.', { variant: 'error' });
+      enqueueSnackbar(`${translate('AnErrorOccurredPleaseTryAgain')}`, { variant: 'error' });
     },
   });
 
@@ -129,7 +129,7 @@ export default function AccountGeneral() {
 
       handleUpdate.mutate(newData);
     } catch (err) {
-      enqueueSnackbar('Có lỗi xảy ra khi upload ảnh.', { variant: 'error' });
+      enqueueSnackbar(`${translate('AnErrorOccurredWhileUploadingTheImage')}`, { variant: 'error' });
     }
   };
 
@@ -155,8 +155,8 @@ export default function AccountGeneral() {
                       color: 'text.secondary',
                     }}
                   >
-                    Cho phép *.jpeg, *.jpg, *.png, *.gif
-                    <br /> Tối đa {fData(3145728)}
+                    {translate('Accept')} *.jpeg, *.jpg, *.png, *.gif
+                    <br /> {translate('Max')} {fData(3145728)}
                   </Typography>
                 }
               />
@@ -177,8 +177,8 @@ export default function AccountGeneral() {
                 <RHFTextField name="name" label="Name" />
                 <RHFTextField name="phone" label="Phone" />
                 <RHFSelect name="gender" label="Gender" SelectProps={{ native: false }}>
-                  <MenuItem value="Nam">Nam</MenuItem>
-                  <MenuItem value="Nữ">Nữ</MenuItem>
+                  <MenuItem value="Nam">{translate('Men')}</MenuItem>
+                  <MenuItem value="Nữ">{translate('Women')}</MenuItem>
                 </RHFSelect>
                 <RHFTextField name="position" label="Position" />
                 <RHFDatePicker name="birthday" label="Birthday" />
@@ -195,7 +195,7 @@ export default function AccountGeneral() {
               </Stack>
               <Stack spacing={3} alignItems="flex-end" sx={{ mt: 3 }}>
                 <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                  Lưu thông tin
+                  {translate('SaveChanges')}
                 </LoadingButton>
               </Stack>
             </Card>

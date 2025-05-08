@@ -1,22 +1,31 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Button, Container, Grid, Typography } from '@mui/material';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { LoadingButton } from '@mui/lab';
-
+// locales
+import { useLocales } from 'src/locales';
+// Component
 import { useSettingsContext } from '../components/settings';
-import { deleteRole, getRoles } from 'src/apis/role.api';
-import { useEffect } from 'react';
-import { RoleTableColumns } from 'src/utils/column';
 import DataTable from 'src/components/table/Table';
+// Api 
+import { deleteRole, getRoles } from 'src/apis/role.api';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getPermisson } from 'src/apis/permission.api';
+// Mui
+import { LoadingButton } from '@mui/lab';
+import { Button, Container, Grid, Typography } from '@mui/material';
+import { RoleTableColumns } from 'src/utils/column';
 
 const RolePage = () => {
   const { themeStretch } = useSettingsContext();
+
   const { enqueueSnackbar } = useSnackbar();
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const navigate = useNavigate();
+
+  const { translate } = useLocales();
 
   const page = searchParams.get('page');
 
@@ -24,7 +33,7 @@ const RolePage = () => {
     ...RoleTableColumns,
     {
       field: 'actions',
-      headerName: 'Hành động',
+      headerName: `${translate('Actions')}`,
       width: 450,
       renderCell: (params: any) => {
         return (
@@ -36,7 +45,7 @@ const RolePage = () => {
                 navigate(`/dashboard/role/update/${params.row.id}`);
               }}
             >
-              Chỉnh sửa
+              {translate('Edit')}
             </Button>
             <LoadingButton
               loading={handleDeleteRole.isPending}
@@ -45,7 +54,7 @@ const RolePage = () => {
                 handleDeleteRole.mutate(params.row.id);
               }}
             >
-              Xóa
+              {translate('Delete')}
             </LoadingButton>
           </Grid>
         );
@@ -80,7 +89,7 @@ const RolePage = () => {
     mutationFn: (id) => deleteRole(id),
     onSuccess: () => {
       refetch();
-      enqueueSnackbar('Xóa thành công', { variant: 'success' });
+      enqueueSnackbar(`${translate('DeleteSuccess')}`, { variant: 'success' });
     },
     onError: (err) => {
       enqueueSnackbar(err.message, { variant: 'error' });
@@ -90,16 +99,16 @@ const RolePage = () => {
   return (
     <>
       <Helmet>
-        <title> Role Page | Minimal UI</title>
+        <title> {translate('RolePage')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          Danh sách quyền
+          {translate('RoleList')}
         </Typography>
 
         <Button sx={{ mb: 2 }} onClick={() => navigate('/dashboard/role/add')}>
-          Tạo quyền
+          {translate('CreateRole')}
         </Button>
 
         <DataTable

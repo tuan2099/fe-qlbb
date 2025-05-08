@@ -2,12 +2,6 @@ import { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
-import { LoadingButton } from '@mui/lab';
-
-import DataTable from 'src/components/table/Table';
-import { SignBoardTableColumns } from 'src/utils/column';
-import { deleteSignboard, getAllSignboard } from 'src/apis/signboard.api';
 // @mui
 import {
   Tab,
@@ -22,8 +16,6 @@ import {
   IconButton,
   TableContainer,
 } from '@mui/material';
-// api
-import { deleteWarehouse, getWarehouses } from 'src/apis/warehouse.api';
 // settings
 import { useSettingsContext } from 'src/components/settings';
 // routes
@@ -43,17 +35,16 @@ import {
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-
-// utils
-import { StorageTableColumns } from 'src/utils/column';
 // sections
 import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
 import { IWarehouse } from 'src/types/warehosue.type';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
-import { SignboardTableRow } from 'src/sections/@dashboard/signboard';
 import { deleteImport, getAllImport } from 'src/apis/import.api';
 import { ImportTableRow } from 'src/sections/@dashboard/import';
+// locales
+import { useLocales } from 'src/locales';
+
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -112,12 +103,18 @@ const ImportPage = () => {
   const [filterCode, setFilterCode] = useState('all');
 
   const [openConfirm, setOpenConfirm] = useState(false);
+
   const context = useContext(AuthContext);
+
   const { hasPermission } = usePermission(context?.userRole, context?.permissions || []);
 
   const [filterManager, setFilterManager] = useState('all');
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const page2 = searchParams.get('page') || '1';
+
+  const { translate } = useLocales();
 
   const {
     data: importData,
@@ -181,7 +178,7 @@ const ImportPage = () => {
     onSuccess: () => {
       refetch();
     },
-    onError: (err) => {},
+    onError: (err) => { },
   });
 
   const handleDeleteRow = (id: number) => {
@@ -217,16 +214,16 @@ const ImportPage = () => {
   return (
     <>
       <Helmet>
-        <title> Nhập Kho | PMC</title>
+        <title> {translate('ImportPage')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Nhập kho"
+          heading={translate('Import')}
           links={[
-            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Nhập kho', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh nhập kho' },
+            { name: `${translate('Home')}`, href: PATH_DASHBOARD.root },
+            { name: `${translate('Import')}`, href: PATH_DASHBOARD.warehouseImport },
+            { name: `${translate('ImportList')}` },
           ]}
           action={
             <>
@@ -237,7 +234,7 @@ const ImportPage = () => {
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  Tạo phiếu nhập
+                  {translate('CreateNewImport')}
                 </Button>
               )}
             </>

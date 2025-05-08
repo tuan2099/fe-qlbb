@@ -4,17 +4,17 @@ import { useFormContext } from 'react-hook-form';
 // @mui
 import { Stack, Divider, Typography, Button } from '@mui/material';
 // hooks
-import useResponsive from '../../../../hooks/useResponsive';
+import useResponsive from 'src/hooks/useResponsive';
 // _mock
-import { _invoiceAddressFrom, _invoiceAddressTo } from '../../../../_mock/arrays';
+import { _invoiceAddressFrom, _invoiceAddressTo } from 'src/_mock/arrays';
 // components
-import Iconify from '../../../../components/iconify';
+import Iconify from 'src/components/iconify';
 //
 import InvoiceAddressListDialog from './InvoiceAddressListDialog';
 import { useQueries } from '@tanstack/react-query';
 import { fetchAllWarehouse, getWarehouses } from 'src/apis/warehouse.api';
 import { fetchAllSupplier } from 'src/apis/supplier.api';
-
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 export default function InvoiceNewEditAddress() {
@@ -23,7 +23,7 @@ export default function InvoiceNewEditAddress() {
     setValue,
     formState: { errors },
   } = useFormContext();
-
+  const { translate } = useLocales();
   const upMd = useResponsive('up', 'md');
 
   const values = watch();
@@ -99,7 +99,7 @@ export default function InvoiceNewEditAddress() {
       <Stack sx={{ width: 1 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
           <Typography variant="h6" sx={{ color: 'text.disabled' }}>
-            Kho:
+            {translate('Warehouse')}:
           </Typography>
 
           <Button
@@ -107,7 +107,7 @@ export default function InvoiceNewEditAddress() {
             startIcon={<Iconify icon="eva:edit-fill" />}
             onClick={handleOpenFrom}
           >
-            Change
+            {translate('Change')}
           </Button>
 
           <InvoiceAddressListDialog
@@ -134,7 +134,7 @@ export default function InvoiceNewEditAddress() {
       <Stack sx={{ width: 1 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
           <Typography variant="h6" sx={{ color: 'text.disabled' }}>
-            Nhà cung cấp:
+            {translate('Supplier')}:
           </Typography>
 
           <Button
@@ -185,18 +185,20 @@ type AddressInfoProps = {
 };
 
 function StorageInfo({ name, manager_by, note }: AddressInfoProps) {
+  const { translate } = useLocales();
   return (
     <>
       <Typography variant="subtitle2">{name}</Typography>
       <Typography variant="body2" sx={{ mt: 1, mb: 0.5 }}>
-        Người quản lý: {manager_by}
+        {translate('Manager')}: {manager_by}
       </Typography>
-      <Typography variant="body2">Ghi chú: {note}</Typography>
+      <Typography variant="body2">{translate('Note')}: {note}</Typography>
     </>
   );
 }
 
 function SupplierInfo({ name, address, branch, region, phone, note }: any) {
+  const { translate } = useLocales();
   return (
     <>
       <Typography variant="subtitle2">{name}</Typography>
@@ -204,7 +206,7 @@ function SupplierInfo({ name, address, branch, region, phone, note }: any) {
       <Typography variant="subtitle2">{branch}</Typography>
       <Typography variant="subtitle2">{region}</Typography>
       <Typography variant="subtitle2">{phone}</Typography>
-      <Typography variant="body2">Ghi chú: {note}</Typography>
+      <Typography variant="body2">{translate('Note')}: {note}</Typography>
     </>
   );
 }

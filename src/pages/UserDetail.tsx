@@ -20,7 +20,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
-
+import { useLocales } from 'src/locales';
 import { useSettingsContext } from '../components/settings';
 import { getUser, updateUser } from 'src/apis/user.api';
 import LoadingScreen from 'src/components/loading-screen';
@@ -44,6 +44,9 @@ type FormValuesProps = {
 
 const UserDetail = () => {
   const { themeStretch } = useSettingsContext();
+
+  const { translate } = useLocales();
+
   const { id } = useParams();
 
   const [open, setOpen] = useState(false);
@@ -55,10 +58,10 @@ const UserDetail = () => {
   };
 
   const LoginSchema = Yup.object().shape({
-    phone: Yup.string().required('Phone is required'),
-    gender: Yup.string().required('Gender is required'),
-    position: Yup.string().required('Position is required'),
-    birthday: Yup.string().required('Birthday is required'),
+    phone: Yup.string().required(`${translate('PhoneIsRequired')}`),
+    gender: Yup.string().required(`${translate('Gender is required')}`),
+    position: Yup.string().required(`${translate('Position is required')}`),
+    birthday: Yup.string().required(`${translate('Birthday is required')}`),
   });
 
   const handleEditClick = () => {
@@ -117,7 +120,7 @@ const UserDetail = () => {
     onSuccess: () => {
       handleClose();
       refetch();
-      enqueueSnackbar('Thông tin đã được cập nhập.', { variant: 'success' });
+      enqueueSnackbar(`${translate('UserInformationUpdatedSuccessfully')}`, { variant: 'success' });
     },
     onError: (err) => enqueueSnackbar(err.message, { variant: 'error' }),
   });
@@ -126,12 +129,12 @@ const UserDetail = () => {
     <>
       {isLoading && <LoadingScreen />}
       <Helmet>
-        <title> User Page | Minimal UI</title>
+        <title> {translate('UserPage')} | Minimal UI</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          User Page
+          {translate('UserPage')}
         </Typography>
 
         {/* <Avatar
@@ -162,7 +165,7 @@ const UserDetail = () => {
           <Grid container spacing={1}>
             <Grid item xs={1}>
               <Typography variant="body2" fontWeight={600}>
-                Phone:
+                {translate('Phone')}:
               </Typography>
             </Grid>
             <Grid item xs={1}>
@@ -173,7 +176,7 @@ const UserDetail = () => {
           <Grid container spacing={1}>
             <Grid item xs={1}>
               <Typography variant="body2" fontWeight={600}>
-                Gender:
+                {translate('Gender')}:
               </Typography>
             </Grid>
             <Grid item xs={1}>
@@ -184,7 +187,7 @@ const UserDetail = () => {
           <Grid container spacing={1}>
             <Grid item xs={1}>
               <Typography variant="body2" fontWeight={600}>
-                Birthday:
+                {translate('Birthday')}:
               </Typography>
             </Grid>
             <Grid item xs={1}>
@@ -197,7 +200,7 @@ const UserDetail = () => {
           <Grid container spacing={1}>
             <Grid item xs={1}>
               <Typography variant="body2" fontWeight={600}>
-                Roles:
+                {translate('Role')}:
               </Typography>
             </Grid>
             <Grid item xs={1}>
@@ -207,7 +210,7 @@ const UserDetail = () => {
             </Grid>
           </Grid>
           <Button variant="contained" sx={{ mt: 2 }} onClick={handleEditClick}>
-            Chỉnh sửa
+            {translate('Edit')}
           </Button>
         </Box>
 
@@ -221,7 +224,7 @@ const UserDetail = () => {
             },
           }}
         >
-          <DialogTitle>Chỉnh sửa thông tin</DialogTitle>
+          <DialogTitle>{translate('EditInfomation')}</DialogTitle>
           <DialogContent>
             <FormProvider
               methods={methods}
@@ -230,8 +233,8 @@ const UserDetail = () => {
               <Stack spacing={3} paddingY={2}>
                 <RHFTextField name="phone" label="Phone" />
                 <RHFSelect name="gender" label="Gender" SelectProps={{ native: false }}>
-                  <MenuItem value="Nam">Nam</MenuItem>
-                  <MenuItem value="Nữ">Nữ</MenuItem>
+                  <MenuItem value="Nam">{translate('Male')}</MenuItem>
+                  <MenuItem value="Nữ">{translate('FeMale')}</MenuItem>
                 </RHFSelect>
                 <RHFTextField name="position" label="Position" />
                 <RHFDatePicker name="birthday" label="Birthday" />
@@ -244,7 +247,7 @@ const UserDetail = () => {
                   />
                 )}
                 <LoadingButton loading={handleUpdate.isPending} type="submit" variant="contained">
-                  Lưu
+                  {translate('Save')}
                 </LoadingButton>
               </Stack>
             </FormProvider>

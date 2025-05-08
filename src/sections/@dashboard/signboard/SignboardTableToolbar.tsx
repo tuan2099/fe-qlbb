@@ -2,7 +2,8 @@
 import { Stack, InputAdornment, TextField, MenuItem, Button } from '@mui/material';
 // components
 import Iconify from '../../../components/iconify';
-
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -24,6 +25,7 @@ export default function SignboardTableToolbar({
     onFilterRole,
     onResetFilter,
 }: Props) {
+    const { translate } = useLocales();
     return (
         <Stack
             spacing={2}
@@ -94,7 +96,7 @@ export default function SignboardTableToolbar({
                     onClick={onResetFilter}
                     startIcon={<Iconify icon="eva:trash-2-outline" />}
                 >
-                    Xoá bộ lọc
+                    {translate('ResetFilter')}
                 </Button>
             )}
         </Stack>

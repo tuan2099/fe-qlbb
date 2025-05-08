@@ -14,15 +14,15 @@ import {
   Avatar,
 } from '@mui/material';
 // utils
-import { fNumber, fCurrency } from '../../../../utils/formatNumber';
+import { fNumber, fCurrency } from 'src/utils/formatNumber';
 // @types
-// import { IInvoiceItem } from '../../../../@types/invoice';
+// import { IInvoiceItem } from 'src/@types/invoice';
 // components
-import Iconify from '../../../../components/iconify';
-import { RHFSelect, RHFTextField } from '../../../../components/hook-form';
+import Iconify from 'src/components/iconify';
+import { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAllSignboard } from 'src/apis/signboard.api';
-
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 const SERVICE_OPTIONS = [
@@ -37,7 +37,7 @@ const SERVICE_OPTIONS = [
 
 export default function InvoiceNewEditDetails() {
   const { control, setValue, watch, resetField } = useFormContext();
-
+  const { translate } = useLocales();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'details',
@@ -110,7 +110,7 @@ export default function InvoiceNewEditDetails() {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h6" sx={{ color: 'text.disabled', mb: 3 }}>
-        Sản phẩm:
+        {translate('Products')}
       </Typography>
 
       <Stack divider={<Divider flexItem sx={{ borderStyle: 'dashed' }} />} spacing={3}>
@@ -146,7 +146,7 @@ export default function InvoiceNewEditDetails() {
                     color: 'text.secondary',
                   }}
                 >
-                  None
+                  {translate('None')}
                 </MenuItem>
 
                 <Divider />
@@ -205,7 +205,7 @@ export default function InvoiceNewEditDetails() {
               startIcon={<Iconify icon="eva:trash-2-outline" />}
               onClick={() => handleRemove(index)}
             >
-              Remove
+              {translate('Delete')}
             </Button>
           </Stack>
         ))}
@@ -224,7 +224,7 @@ export default function InvoiceNewEditDetails() {
           onClick={handleAdd}
           sx={{ flexShrink: 0 }}
         >
-          Add Item
+          {translate('AddItem')}
         </Button>
 
         <Stack
@@ -246,7 +246,7 @@ export default function InvoiceNewEditDetails() {
 
       <Stack spacing={2} sx={{ mt: 3 }}>
         <Stack direction="row" justifyContent="flex-end">
-          <Typography>Subtotal :</Typography>
+          <Typography>{translate('Subtotal')} :</Typography>
           <Typography sx={{ textAlign: 'right', width: 120 }}>
             {fCurrency(sum(totalOnRow))}
           </Typography>
@@ -262,7 +262,7 @@ export default function InvoiceNewEditDetails() {
         </Stack>
 
         <Stack direction="row" justifyContent="flex-end">
-          <Typography variant="h6">Total price :</Typography>
+          <Typography variant="h6">{translate('TotalPrice')}:</Typography>
           <Typography variant="h6" sx={{ textAlign: 'right', width: 120 }}>
             {fCurrency(paid_amount)}
           </Typography>

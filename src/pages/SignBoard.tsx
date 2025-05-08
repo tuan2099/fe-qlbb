@@ -4,7 +4,6 @@ import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-d
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
-
 import DataTable from 'src/components/table/Table';
 import { SignBoardTableColumns } from 'src/utils/column';
 import { deleteSignboard, getAllSignboard } from 'src/apis/signboard.api';
@@ -44,14 +43,14 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 
-// utils
-import { StorageTableColumns } from 'src/utils/column';
 // sections
 import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
+import { SignboardTableRow } from 'src/sections/@dashboard/signboard';
 import { IWarehouse } from 'src/types/warehosue.type';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
-import { SignboardTableRow } from 'src/sections/@dashboard/signboard';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -109,12 +108,18 @@ const SignBoard = () => {
   const [filterCode, setFilterCode] = useState('all');
 
   const [openConfirm, setOpenConfirm] = useState(false);
+
   const context = useContext(AuthContext);
+
   const { hasPermission } = usePermission(context?.userRole, context?.permissions || []);
 
   const [filterManager, setFilterManager] = useState('all');
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const page2 = searchParams.get('page') || '1';
+
+  const { translate } = useLocales();
 
   const {
     data: signboardData,
@@ -178,7 +183,7 @@ const SignBoard = () => {
     onSuccess: () => {
       refetch();
     },
-    onError: (err) => {},
+    onError: (err) => { },
   });
 
   const handleDeleteRow = (id: number) => {
@@ -214,16 +219,16 @@ const SignBoard = () => {
   return (
     <>
       <Helmet>
-        <title> Biển Bảng | PMC</title>
+        <title> {translate('SignBoard')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Biển bảng"
+          heading={translate('SignBoard')}
           links={[
-            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Biển bảng', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh biển bảng' },
+            { name: `${translate('Home')}`, href: PATH_DASHBOARD.root },
+            { name: `${translate('SignBoard')}`, href: PATH_DASHBOARD.user.root },
+            { name: `${translate('SignBoardList')}` },
           ]}
           action={
             <>
@@ -234,7 +239,7 @@ const SignBoard = () => {
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  Tạo biển bảng
+                  {translate('CreateSignBoard')}
                 </Button>
               )}
             </>

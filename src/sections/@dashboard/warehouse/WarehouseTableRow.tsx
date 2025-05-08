@@ -14,12 +14,12 @@ import {
 // @types
 // import { IUserAccountGeneral } from '../../../../@types/user';
 // components
-import Label from '../../../components/label';
 import Iconify from '../../../components/iconify';
 import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -38,7 +38,7 @@ export default function WarehouseTableRow({
     onDeleteRow,
 }: Props) {
     const { name, note, manager_by } = row;
-
+    const { translate } = useLocales();
     const [openConfirm, setOpenConfirm] = useState(false);
 
     const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
@@ -106,7 +106,7 @@ export default function WarehouseTableRow({
                         sx={{ color: 'error.main' }}
                     >
                         <Iconify icon="eva:trash-2-outline" />
-                        Xoá
+                        {translate('Delete')}
                     </MenuItem>
                 )}
                 {hasPermission('storage_edit') && (
@@ -117,7 +117,7 @@ export default function WarehouseTableRow({
                         }}
                     >
                         <Iconify icon="eva:edit-fill" />
-                        Chỉnh sửa
+                        {translate('Edit')}
                     </MenuItem>
                 )}
             </MenuPopover>
@@ -129,7 +129,7 @@ export default function WarehouseTableRow({
                 content="Are you sure want to delete?"
                 action={
                     <Button variant="contained" color="error" onClick={onDeleteRow}>
-                        Xoá
+                        {translate('Delete')}
                     </Button>
                 }
             />

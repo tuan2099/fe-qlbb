@@ -20,6 +20,8 @@ import MenuPopover from '../../../components/menu-popover';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -38,7 +40,7 @@ export default function SignboardTableRow({
   onDeleteRow,
 }: Props) {
   const [openConfirm, setOpenConfirm] = useState(false);
-
+  const { translate } = useLocales();
   const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
 
   const handleOpenConfirm = () => {
@@ -106,7 +108,7 @@ export default function SignboardTableRow({
             sx={{ color: 'error.main' }}
           >
             <Iconify icon="eva:trash-2-outline" />
-            Xoá
+            {translate('Delete')}
           </MenuItem>
         )}
         {hasPermission('storage_update') && (
@@ -117,7 +119,7 @@ export default function SignboardTableRow({
             }}
           >
             <Iconify icon="eva:edit-fill" />
-            Chỉnh sửa
+            {translate('Edit')}
           </MenuItem>
         )}
       </MenuPopover>
@@ -129,7 +131,7 @@ export default function SignboardTableRow({
         content="Are you sure want to delete?"
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
-            Xoá
+            {translate('Delete')}
           </Button>
         }
       />

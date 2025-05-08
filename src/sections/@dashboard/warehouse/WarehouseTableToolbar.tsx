@@ -1,8 +1,9 @@
 // @mui
 import { Stack, InputAdornment, TextField, MenuItem, Button } from '@mui/material';
 // components
-import Iconify from '../../../components/iconify';
-
+import Iconify from 'src/components/iconify';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -24,6 +25,8 @@ export default function WarehouseTableToolbar({
     onFilterRole,
     onResetFilter,
 }: Props) {
+
+    const { translate } = useLocales();
     return (
         <Stack
             spacing={2}
@@ -77,7 +80,7 @@ export default function WarehouseTableToolbar({
                 fullWidth
                 value={filterName}
                 onChange={onFilterName}
-                placeholder="Search..."
+                placeholder={translate('Search')}
                 InputProps={{
                     startAdornment: (
                         <InputAdornment position="start">
@@ -94,7 +97,7 @@ export default function WarehouseTableToolbar({
                     onClick={onResetFilter}
                     startIcon={<Iconify icon="eva:trash-2-outline" />}
                 >
-                    Xoá bộ lọc
+                    {translate('ResetFilter')}
                 </Button>
             )}
         </Stack>

@@ -12,14 +12,14 @@ import {
     Typography,
 } from '@mui/material';
 // @types
-// import { IUserAccountGeneral } from '../../../../@types/user';
 // components
-import Label from '../../../../components/label';
 import Iconify from '../../../../components/iconify';
 import MenuPopover from '../../../../components/menu-popover';
 import ConfirmDialog from '../../../../components/confirm-dialog';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -37,8 +37,8 @@ export default function UserTableRow({
     onSelectRow,
     onDeleteRow,
 }: Props) {
-    const { name, note, avatar, gender, position, phone, email, roles, birthday } = row;
-    console.log()
+    const { name, avatar, gender, position, phone, email, roles, birthday } = row;
+    const { translate } = useLocales();
     const [openConfirm, setOpenConfirm] = useState(false);
 
     const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
@@ -110,7 +110,7 @@ export default function UserTableRow({
                         sx={{ color: 'error.main' }}
                     >
                         <Iconify icon="eva:trash-2-outline" />
-                        Xoá
+                        {translate('Delete')}
                     </MenuItem>
                 )}
                 {hasPermission('user_edit') && (
@@ -121,7 +121,7 @@ export default function UserTableRow({
                         }}
                     >
                         <Iconify icon="eva:edit-fill" />
-                        Chỉnh sửa
+                        {translate('Edit')}
                     </MenuItem>
                 )}
             </MenuPopover>
@@ -129,11 +129,11 @@ export default function UserTableRow({
             <ConfirmDialog
                 open={openConfirm}
                 onClose={handleCloseConfirm}
-                title="Delete"
-                content="Are you sure want to delete?"
+                title={translate('Delete')}
+                content={translate('AreYouSureToDeleteThisUser?')}
                 action={
                     <Button variant="contained" color="error" onClick={onDeleteRow}>
-                        Xoá
+                        {translate('Delete')}
                     </Button>
                 }
             />

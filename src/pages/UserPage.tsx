@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
 // @mui
 import {
   Tab,
@@ -18,6 +17,7 @@ import {
 } from '@mui/material';
 // api
 import { deleteUser, getAllUser } from 'src/apis/user.api';
+import { useMutation, useQuery } from '@tanstack/react-query';
 // settings
 import { useSettingsContext } from 'src/components/settings';
 // routes
@@ -43,6 +43,8 @@ import { UserTableRow, UserTableToolbar } from 'src/sections/@dashboard/user/use
 import { IWarehouse } from 'src/types/warehosue.type';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
+// locales
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
@@ -98,12 +100,18 @@ export default function PageOne() {
   const [filterCode, setFilterCode] = useState('all');
 
   const [openConfirm, setOpenConfirm] = useState(false);
+
   const context = useContext(AuthContext)
+
   const { hasPermission } = usePermission(context?.userRole, context?.permissions || [])
 
   const [filterManager, setFilterManager] = useState('all');
+
   const [searchParams, setSearchParams] = useSearchParams();
+
   const page2 = searchParams.get('page') || '1';
+
+  const { translate } = useLocales();
 
   const {
     data: userData,
@@ -207,7 +215,7 @@ export default function PageOne() {
   return (
     <>
       <Helmet>
-        <title> User Page | Minimal UI</title>
+        <title> {translate('UserPage')} | Minimal UI</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
@@ -227,7 +235,7 @@ export default function PageOne() {
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  Tạo Người dùng
+                  {translate('CreateUser')}
                 </Button>}
             </>
           }

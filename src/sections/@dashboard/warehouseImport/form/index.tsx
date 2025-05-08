@@ -23,7 +23,7 @@ import { useMutation } from '@tanstack/react-query';
 import { addImport, updateImport } from 'src/apis/import.api';
 import { useSnackbar } from 'notistack';
 import { uploadAvatar } from 'src/apis/user.api';
-
+import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type IFormValuesProps = Omit<any, 'createDate' | 'dueDate' | 'invoiceFrom' | 'invoiceTo'>;
@@ -44,7 +44,7 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
   const { enqueueSnackbar } = useSnackbar();
   const { id } = useParams();
   const isAddMode = !Boolean(id);
-
+  const { translate } = useLocales();
   const [loadingSave, setLoadingSave] = useState(false);
 
   const [loadingSend, setLoadingSend] = useState(false);
@@ -100,13 +100,13 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
       return uploadAvatar(data);
     },
     onError: () => {
-      enqueueSnackbar('Có lỗi xảy ra ! Vui lòng thử lại.', { variant: 'error' });
+      enqueueSnackbar(`${translate('AnErrorOccurredPleaseTryAgain')}`, { variant: 'error' });
     },
   });
   const handleCreate = useMutation({
     mutationFn: (data: any) => addImport(data),
     onSuccess: () => {
-      enqueueSnackbar('Phiếu nhập đã được tạo.', { variant: 'success' });
+      enqueueSnackbar(`${translate('CreatedWarehouseReceipt')}`, { variant: 'success' });
     },
     onError: (err) => {
       enqueueSnackbar(err.message, { variant: 'error' });
@@ -123,7 +123,7 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
       return updateImport({ id, data: cleanedData });
     },
     onSuccess: () => {
-      enqueueSnackbar('Phiếu nhập đã được cập nhập.', { variant: 'success' });
+      enqueueSnackbar(`${translate('UpdatedWarehouseReceipt')}`, { variant: 'success' });
     },
     onError: (err) => {
       enqueueSnackbar(err.message, { variant: 'error' });
@@ -149,7 +149,7 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
       if (isAddMode) await handleCreate.mutateAsync(updatedValues);
       else await handleUpdate.mutateAsync(updatedValues);
     } catch (err) {
-      enqueueSnackbar('Đã có lỗi xảy ra', { variant: 'error' });
+      enqueueSnackbar(`${translate('AnErrorOccurredPleaseTryAgain')}`, { variant: 'error' });
     }
   };
 
@@ -170,7 +170,7 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
           loading={handleCreate.isPending || handleUpdate.isPending}
           onClick={handleSubmit(handleCreateAndSend)}
         >
-          {isEdit ? 'Cập nhập' : 'Tạo'} phiếu nhập
+          {isEdit ? `${translate('Update')}` : `${'Create'}`} {translate('WarehouseReceipt')}
         </LoadingButton>
       </Stack>
     </FormProvider>
