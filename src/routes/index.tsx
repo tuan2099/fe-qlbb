@@ -115,7 +115,7 @@ export default function Router() {
           children: [
             { element: <WarehouseDispatchPage replace />, index: true },
             { path: 'add', element: <AddWarehouseDispatch /> },
-            // { path: 'update/:id', element: <WarehouseDispatchPage /> }
+            { path: 'update/:id', element: <AddWarehouseDispatch /> },
           ],
         },
         {

@@ -69,6 +69,7 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
       signature_deliverer: currentInvoice?.signature_deliverer || '',
       signature_storekeeper: currentInvoice?.signature_storekeeper || '',
       signature_accountant: currentInvoice?.signature_accountant || '',
+      vat: currentInvoice?.vat || '',
     }),
     [currentInvoice]
   );

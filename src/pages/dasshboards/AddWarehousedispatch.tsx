@@ -1,33 +1,43 @@
 import { Helmet } from 'react-helmet-async';
-// @mui
 import { Container } from '@mui/material';
-// routes
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'react-router';
+
 import { PATH_DASHBOARD } from '../../routes/paths';
-// components
 import { useSettingsContext } from '../../components/settings';
 import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
-// sections
 import InvoiceNewEditForm from '../../sections/@dashboard/warehouseDispatch/form';
+import { getExport } from 'src/apis/export.api';
 
 export default function AddWarehouseDispatch() {
-    const { themeStretch } = useSettingsContext();
+  const { themeStretch } = useSettingsContext();
+  const { id } = useParams();
+  const isAddMode = !Boolean(id);
 
-    return (
-        <Container maxWidth={themeStretch ? false : 'xl'}>
-            <Helmet>
-                <title> Tạo phiếu xuất kho | PMC </title>
-            </Helmet>
+  const { data: importData } = useQuery({
+    queryKey: ['import', id],
+    queryFn: () => getExport(id),
+    enabled: Boolean(id),
+  });
 
-            <CustomBreadcrumbs
-                heading="Add Warehouse Dispatch"
-                links={[
-                    { name: 'Dashboard', href: PATH_DASHBOARD.root },
-                    { name: 'Warehouse Dispatch', href: "#" },
-                    { name: 'Add' },
-                ]}
-            />
+  console.log(importData?.data.response[0]);
 
-            <InvoiceNewEditForm />
-        </Container>
-    );
+  return (
+    <Container maxWidth={themeStretch ? false : 'xl'}>
+      <Helmet>
+        <title> Tạo phiếu xuất kho | PMC </title>
+      </Helmet>
+
+      <CustomBreadcrumbs
+        heading="Tạo phiếu xuất"
+        links={[
+          { name: 'Dashboard', href: PATH_DASHBOARD.root },
+          { name: 'Xuất kho', href: '#' },
+          { name: 'Tạo mới' },
+        ]}
+      />
+
+      <InvoiceNewEditForm isEdit={!isAddMode} currentInvoice={importData?.data.response[0]} />
+    </Container>
+  );
 }
