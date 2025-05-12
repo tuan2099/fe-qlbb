@@ -87,6 +87,11 @@ const navConfig = [
         icon: ICONS.ecommerce,
       },
       {
+        title: 'Chuyển kho',
+        path: PATH_DASHBOARD.warehouseTransfer,
+        icon: ICONS.ecommerce,
+      },
+      {
         title: 'Biển bảng',
         path: PATH_DASHBOARD.signboard,
         icon: ICONS.product,

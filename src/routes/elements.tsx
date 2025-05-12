@@ -44,3 +44,10 @@ export const WarehouseDispatchPage = Loadable(
 export const AddWarehouseDispatch = Loadable(
   lazy(() => import('../pages/dasshboards/AddWarehousedispatch'))
 );
+
+export const WarehouseTransferPage = Loadable(
+  lazy(() => import('../pages/dasshboards/WarehouseTransferPage'))
+);
+export const AddWarehouseTransfer = Loadable(
+  lazy(() => import('../pages/dasshboards/AddWarehouseTransfer'))
+);
