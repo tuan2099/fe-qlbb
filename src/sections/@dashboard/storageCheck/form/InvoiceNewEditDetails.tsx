@@ -1,12 +1,40 @@
-import { useCallback } from 'react';
+import sum from 'lodash/sum';
+import { useCallback, useEffect } from 'react';
+// form
 import { useFormContext, useFieldArray } from 'react-hook-form';
-import { Box, Stack, Button, Divider, Typography, MenuItem, Avatar } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
-
+// @mui
+import {
+  Box,
+  Stack,
+  Button,
+  Divider,
+  Typography,
+  InputAdornment,
+  MenuItem,
+  Avatar,
+} from '@mui/material';
+// utils
+import { fNumber, fCurrency } from 'src/utils/formatNumber';
+// @types
+// import { IInvoiceItem } from 'src/@types/invoice';
+// components
 import Iconify from 'src/components/iconify';
 import { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import { useQuery } from '@tanstack/react-query';
+import { fetchAllSignboard } from 'src/apis/signboard.api';
 import { useLocales } from 'src/locales';
 import { getSignboardInWarehouse } from 'src/apis/warehouse.api';
+// ----------------------------------------------------------------------
+
+const SERVICE_OPTIONS = [
+  { id: 1, name: 'full stack development', price: 90.99 },
+  { id: 2, name: 'backend development', price: 80.99 },
+  { id: 3, name: 'ui design', price: 70.99 },
+  { id: 4, name: 'ui/ux design', price: 60.99 },
+  { id: 5, name: 'front end development', price: 40.99 },
+];
+
+// ----------------------------------------------------------------------
 
 export default function InvoiceNewEditDetails() {
   const { control, setValue, watch, resetField } = useFormContext();
@@ -17,21 +45,21 @@ export default function InvoiceNewEditDetails() {
   });
 
   const values = watch();
-  const { from_storage_id } = values;
+  const { storage_id } = values;
 
   const { data: signboard } = useQuery({
-    queryKey: ['allSignboardInWarehouse', from_storage_id],
+    queryKey: ['allSignboardInWarehouse', storage_id],
     queryFn: () => {
-      return getSignboardInWarehouse(from_storage_id);
+      return getSignboardInWarehouse(storage_id);
     },
-    enabled: Boolean(from_storage_id),
+    enabled: Boolean(storage_id),
   });
 
   const handleAdd = () => {
     append({
       signboard_id: '',
       signboard_name: '',
-      quantity: 1,
+      actual_quantity: 1,
     });
   };
 
@@ -41,7 +69,7 @@ export default function InvoiceNewEditDetails() {
 
   const handleClearService = useCallback(
     (index: number) => {
-      resetField(`details[${index}].quantity`);
+      resetField(`details[${index}].actual_quantity`);
     },
     [resetField]
   );
@@ -56,9 +84,9 @@ export default function InvoiceNewEditDetails() {
     [setValue, values.details]
   );
 
-  const handleChangeQuantity = useCallback(
+  const handleChangeactual_quantity = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
-      setValue(`details[${index}].quantity`, Number(event.target.value));
+      setValue(`details[${index}].actual_quantity`, Number(event.target.value));
     },
     [setValue, values.details]
   );
@@ -133,10 +161,10 @@ export default function InvoiceNewEditDetails() {
               <RHFTextField
                 size="small"
                 type="number"
-                name={`details[${index}].quantity`}
-                label="Quantity"
+                name={`details[${index}].actual_quantity`}
+                label="actual_quantity"
                 placeholder="0"
-                onChange={(event) => handleChangeQuantity(event, index)}
+                onChange={(event) => handleChangeactual_quantity(event, index)}
                 InputLabelProps={{ shrink: true }}
                 sx={{ maxWidth: { md: 150 } }}
               />
@@ -156,7 +184,7 @@ export default function InvoiceNewEditDetails() {
 
       <Divider sx={{ my: 3, borderStyle: 'dashed' }} />
 
-      {Boolean(from_storage_id) && (
+      {Boolean(storage_id) && (
         <Stack
           spacing={2}
           direction={{ xs: 'column-reverse', md: 'row' }}

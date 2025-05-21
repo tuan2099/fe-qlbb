@@ -99,3 +99,11 @@ export const fetchAllWarehouse = async (): Promise<any[]> => {
 
   return allData;
 };
+
+export const getSignboardInStorage = (id: any) => {
+  return http.get(`/signboard_storages?store_id=${id}`, {
+    headers: {
+      Authorization: `Bearer ${getStorage('accessToken')}`,
+    },
+  });
+};

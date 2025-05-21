@@ -1,8 +1,6 @@
 import { useState, useContext } from 'react';
-// @mui
 import {
   Stack,
-  Avatar,
   Button,
   Checkbox,
   TableRow,
@@ -11,15 +9,12 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
-// @types
-// import { IUserAccountGeneral } from '../../../../@types/user';
-// components
-import Iconify from '../../../components/iconify';
-import MenuPopover from '../../../components/menu-popover';
-import ConfirmDialog from '../../../components/confirm-dialog';
+
+import Iconify from '../../../../components/iconify';
+import MenuPopover from '../../../../components/menu-popover';
+import ConfirmDialog from '../../../../components/confirm-dialog';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
-import { useLocales } from 'src/locales';
 // ----------------------------------------------------------------------
 
 type Props = {
@@ -28,19 +23,15 @@ type Props = {
   onEditRow: VoidFunction;
   onSelectRow: VoidFunction;
   onDeleteRow: VoidFunction;
-  onViewRow: VoidFunction;
 };
 
-export default function WarehouseTableRow({
+export default function StorageCheckTableRow({
   row,
   selected,
   onEditRow,
   onSelectRow,
   onDeleteRow,
-  onViewRow,
 }: Props) {
-  const { name, note, manager_by } = row;
-  const { translate } = useLocales();
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
@@ -72,19 +63,16 @@ export default function WarehouseTableRow({
 
         <TableCell>
           <Stack direction="row" alignItems="center" spacing={2}>
-            {/* <Avatar alt={name} src={avatarUrl} /> */}
-
             <Typography variant="subtitle2" noWrap>
-              {name}
+              {row.code}
             </Typography>
           </Stack>
         </TableCell>
 
-        <TableCell align="left">{note}</TableCell>
-
-        <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-          {manager_by?.name || ''}
-        </TableCell>
+        <TableCell align="left">{row.title}</TableCell>
+        <TableCell align="left">{row.note}</TableCell>
+        <TableCell align="left">{row.storage.name}</TableCell>
+        <TableCell align="left">{row.creator.name}</TableCell>
 
         <TableCell align="right">
           <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
@@ -99,7 +87,7 @@ export default function WarehouseTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        {hasPermission('storage_delete') && (
+        {hasPermission('transfer_delete') && (
           <MenuItem
             onClick={() => {
               handleOpenConfirm();
@@ -108,10 +96,10 @@ export default function WarehouseTableRow({
             sx={{ color: 'error.main' }}
           >
             <Iconify icon="eva:trash-2-outline" />
-            {translate('Delete')}
+            Xoá
           </MenuItem>
         )}
-        {hasPermission('storage_edit') && (
+        {hasPermission('transfer_edit') && (
           <MenuItem
             onClick={() => {
               onEditRow();
@@ -119,18 +107,9 @@ export default function WarehouseTableRow({
             }}
           >
             <Iconify icon="eva:edit-fill" />
-            {translate('Edit')}
+            Chỉnh sửa
           </MenuItem>
         )}
-        <MenuItem
-          onClick={() => {
-            onViewRow();
-            handleClosePopover();
-          }}
-        >
-          <Iconify icon="eva:eye-fill" />
-          {translate('View')}
-        </MenuItem>
       </MenuPopover>
 
       <ConfirmDialog
@@ -140,7 +119,7 @@ export default function WarehouseTableRow({
         content="Are you sure want to delete?"
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
-            {translate('Delete')}
+            Xoá
           </Button>
         }
       />
