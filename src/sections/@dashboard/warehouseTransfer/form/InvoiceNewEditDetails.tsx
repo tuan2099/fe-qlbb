@@ -23,6 +23,7 @@ import { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAllSignboard } from 'src/apis/signboard.api';
 import { useLocales } from 'src/locales';
+import { getSignboardInWarehouse } from 'src/apis/warehouse.api';
 // ----------------------------------------------------------------------
 
 const SERVICE_OPTIONS = [
@@ -44,11 +45,20 @@ export default function InvoiceNewEditDetails() {
   });
 
   const values = watch();
+  const { from_storage_id } = values;
+
+  console.log(Boolean(from_storage_id));
 
   const { data: signboard } = useQuery({
-    queryKey: ['allSignboard'],
-    queryFn: () => fetchAllSignboard(),
+    queryKey: ['allSignboardInWarehouse', from_storage_id],
+    queryFn: () => {
+      console.log('chay');
+      return getSignboardInWarehouse(from_storage_id);
+    },
+    enabled: Boolean(from_storage_id),
   });
+
+  console.log(signboard);
 
   const handleAdd = () => {
     append({
