@@ -31,6 +31,9 @@ import {
   AddWarehouseImport,
   WarehouseTransferPage,
   AddWarehouseTransfer,
+  StorageCheckPage,
+  AddStorageCheck,
+  StorageDetail,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -86,6 +89,7 @@ export default function Router() {
             { element: <WarehousePage replace />, index: true },
             { path: 'add', element: <AddWarehouse /> },
             { path: 'update/:id', element: <AddWarehouse /> },
+            { path: 'view/:id', element: <StorageDetail /> },
           ],
         },
         {
@@ -134,6 +138,14 @@ export default function Router() {
             { element: <ImportPage replace />, index: true },
             { path: 'add', element: <AddWarehouseImport /> },
             { path: 'update/:id', element: <AddWarehouseImport /> },
+          ],
+        },
+        {
+          path: 'storage-check',
+          children: [
+            { element: <StorageCheckPage replace />, index: true },
+            { path: 'add', element: <AddStorageCheck /> },
+            { path: 'update/:id', element: <AddStorageCheck /> },
           ],
         },
       ],

@@ -51,3 +51,9 @@ export const WarehouseTransferPage = Loadable(
 export const AddWarehouseTransfer = Loadable(
   lazy(() => import('../pages/dasshboards/AddWarehouseTransfer'))
 );
+
+export const StorageCheckPage = Loadable(
+  lazy(() => import('../pages/dasshboards/StorageCheckPage'))
+);
+export const AddStorageCheck = Loadable(lazy(() => import('../pages/dasshboards/AddStorageCheck')));
+export const StorageDetail = Loadable(lazy(() => import('../pages/dasshboards/StorageDetail')));
