@@ -43,6 +43,35 @@ export const deleteWarehouse = (id: any) => {
   });
 };
 
+export const getSignboardInWarehouse = async (id: any): Promise<any[]> => {
+  let allData: any[] = [];
+  let hasNext = true;
+  let page = '';
+  while (hasNext) {
+    const response = await http.get(`/signboard_storages?store_id=${id}`, {
+      params: {
+        page,
+        limit: 100,
+      },
+
+      headers: {
+        Authorization: `Bearer ${getStorage('accessToken')}`,
+      },
+    });
+
+    const data = response.data?.response.data || [];
+
+    allData = [...allData, ...data];
+
+    if (data.length < 100) {
+      hasNext = false;
+    } else {
+    }
+  }
+
+  return allData;
+};
+
 export const fetchAllWarehouse = async (): Promise<any[]> => {
   let allData: any[] = [];
   let hasNext = true;
@@ -69,4 +98,12 @@ export const fetchAllWarehouse = async (): Promise<any[]> => {
   }
 
   return allData;
+};
+
+export const getSignboardInStorage = (id: any) => {
+  return http.get(`/signboard_storages?store_id=${id}`, {
+    headers: {
+      Authorization: `Bearer ${getStorage('accessToken')}`,
+    },
+  });
 };

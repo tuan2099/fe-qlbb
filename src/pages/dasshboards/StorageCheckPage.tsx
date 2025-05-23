@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
-// @mui
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   Tab,
   Tabs,
@@ -16,13 +15,9 @@ import {
   IconButton,
   TableContainer,
 } from '@mui/material';
-// api
-import { deleteWarehouse, getWarehouses } from 'src/apis/warehouse.api';
-// settings
+
 import { useSettingsContext } from 'src/components/settings';
-// routes
-import { PATH_DASHBOARD } from '../routes/paths';
-// components
+import { PATH_DASHBOARD } from '../../routes/paths';
 import {
   useTable,
   getComparator,
@@ -32,25 +27,27 @@ import {
   TableHeadCustom,
   TableSelectedAction,
   TablePaginationCustom,
+  TableSkeleton,
 } from 'src/components/table';
-import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
-import CustomBreadcrumbs from '../components/custom-breadcrumbs';
-
-// sections
-import { WarehouseTableRow, WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
+import Iconify from '../../components/iconify';
+import Scrollbar from '../../components/scrollbar';
+import CustomBreadcrumbs from '../../components/custom-breadcrumbs';
+import { WarehouseTableToolbar } from 'src/sections/@dashboard/warehouse';
 import { IWarehouse } from 'src/types/warehosue.type';
 import { AuthContext } from 'src/auth/JwtContext';
 import { usePermission } from 'src/hooks/usePermisson';
-// locales
-import { useLocales } from 'src/locales';
+import WarehouseTransferTableRow from 'src/sections/@dashboard/warehouseTransfer/list/WarehouseTransferTableRow';
+import { getAllStorageCheck, deleteStorageCheck } from 'src/apis/storageCheck.api';
+import StorageCheckTableRow from 'src/sections/@dashboard/storageCheck/list/StorageCheckTableRow';
 // ----------------------------------------------------------------------
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
 const TABLE_HEAD = [
-  { id: 'name', label: 'Tên Kho', align: 'left' },
+  { id: 'code', label: 'CODE', align: 'left' },
+  { id: 'title', label: 'Tiêu đề', align: 'left' },
   { id: 'note', label: 'Ghi chú', align: 'left' },
-  { id: 'manager_by', label: 'Người quản lý', align: 'left' },
+  { id: 'storage', label: 'Kho kiểm', align: 'left' },
+  { id: 'creator', label: 'Người tạo', align: 'left' },
 ];
 
 const ROLE_OPTIONS = [
@@ -66,7 +63,7 @@ const ROLE_OPTIONS = [
   'full stack developer',
 ];
 
-export default function WarehousePage() {
+const StorageCheckPage = () => {
   const {
     dense,
     page,
@@ -75,18 +72,14 @@ export default function WarehousePage() {
     rowsPerPage,
     setPage,
     selected,
-    setSelected,
     onSelectRow,
     onSelectAllRows,
     onSort,
     onChangeDense,
-    onChangePage,
     onChangeRowsPerPage,
   } = useTable({ defaultRowsPerPage: 10 });
 
   const { themeStretch } = useSettingsContext();
-
-  const { translate } = useLocales();
 
   const navigate = useNavigate();
 
@@ -96,34 +89,30 @@ export default function WarehousePage() {
 
   const [filterCode, setFilterCode] = useState('all');
 
-  const [openConfirm, setOpenConfirm] = useState(false);
-
+  const [_, setOpenConfirm] = useState(false);
   const context = useContext(AuthContext);
-
   const { hasPermission } = usePermission(context?.userRole, context?.permissions || []);
 
   const [filterManager, setFilterManager] = useState('all');
-
   const [searchParams, setSearchParams] = useSearchParams();
-
   const page2 = searchParams.get('page') || '1';
 
   const {
-    data: warehouseData,
+    data: storageCheckData,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['warehouses', page2],
-    queryFn: () => getWarehouses({ page: page2 }),
+    queryKey: ['storage_check', page2],
+    queryFn: () => getAllStorageCheck({ page: page2 }),
   });
 
   useEffect(() => {
-    if (warehouseData?.data?.response?.[0]) {
-      const res = warehouseData.data.response[0];
+    if (storageCheckData?.data?.response?.[0]) {
+      const res = storageCheckData.data.response[0];
       setTableData(res.data);
       setPage(res.current_page - 1);
     }
-  }, [warehouseData]);
+  }, [storageCheckData]);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -133,7 +122,6 @@ export default function WarehousePage() {
     filterManager,
   });
 
-  const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   const denseHeight = dense ? 52 : 72;
 
   const isFiltered = filterName !== '' || filterCode !== 'all' || filterManager !== 'all';
@@ -151,7 +139,7 @@ export default function WarehousePage() {
     setOpenConfirm(false);
   };
 
-  const handleFilterCode = (event: React.SyntheticEvent<Element, Event>, newValue: string) => {
+  const handleFilterCode = (_: React.SyntheticEvent<Element, Event>, newValue: string) => {
     setPage(0);
     setFilterCode(newValue);
   };
@@ -167,39 +155,19 @@ export default function WarehousePage() {
   };
 
   const handleDeleteRole = useMutation({
-    mutationFn: (id: number) => deleteWarehouse(id),
+    mutationFn: (id: number) => deleteStorageCheck(id),
     onSuccess: () => {
       refetch();
     },
-    onError: (err) => {},
+    onError: (_) => {},
   });
 
   const handleDeleteRow = (id: number) => {
     handleDeleteRole.mutate(id);
   };
 
-  const handleDeleteRows = (selected: string[]) => {
-    // const deleteRows = tableData.filter((row) => !selected.includes(row.id));
-    // setSelected([]);
-    // setTableData(deleteRows);
-    // if (page > 0) {
-    //   if (selected.length === dataInPage.length) {
-    //     setPage(page - 1);
-    //   } else if (selected.length === dataFiltered.length) {
-    //     setPage(0);
-    //   } else if (selected.length > dataInPage.length) {
-    //     const newPage = Math.ceil((tableData.length - selected.length) / rowsPerPage) - 1;
-    //     setPage(newPage);
-    //   }
-    // }
-  };
-
   const handleEditRow = (id: number) => {
-    navigate(`/dashboard/warehouse/update/${id}`);
-  };
-
-  const handleViewRow = (id: number) => {
-    navigate(`/dashboard/warehouse/view/${id}`);
+    navigate(`/dashboard/storage-check/update/${id}`);
   };
 
   const handleResetFilter = () => {
@@ -211,27 +179,26 @@ export default function WarehousePage() {
   return (
     <>
       <Helmet>
-        <title>{translate('Warehouse')} | PMC</title>
+        <title> Phiếu Kiểm | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading={translate('Warehouse')}
+          heading="Phiếu Kiểm"
           links={[
-            { name: `${translate('HomePage')}`, href: PATH_DASHBOARD.root },
-            { name: `${translate('Warehouse')}`, href: PATH_DASHBOARD.warehouse },
-            { name: `${translate('WarehouseList')}` },
+            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
+            { name: 'Danh sách phiếu kiểm' },
           ]}
           action={
             <>
-              {hasPermission('storage_create') && (
+              {hasPermission('transfer_create') && (
                 <Button
-                  to="/dashboard/warehouse/add"
+                  to="/dashboard/storage-check/add"
                   component={RouterLink}
                   variant="contained"
                   startIcon={<Iconify icon="eva:plus-fill" />}
                 >
-                  {translate('CreateNewWarehouse')}
+                  Tạo phiếu kiểm
                 </Button>
               )}
             </>
@@ -302,22 +269,25 @@ export default function WarehousePage() {
                 />
 
                 <TableBody>
-                  {tableData.map((row) => (
-                    <WarehouseTableRow
-                      key={row.id}
-                      row={row}
-                      selected={selected.includes(row.id)}
-                      onSelectRow={() => onSelectRow(row.id)}
-                      onDeleteRow={() => handleDeleteRow(Number(row.id))}
-                      onEditRow={() => handleEditRow(Number(row.id))}
-                      onViewRow={() => handleViewRow(Number(row.id))}
-                    />
-                  ))}
+                  {isLoading &&
+                    Array(10)
+                      .fill(0)
+                      .map((_, i) => <TableSkeleton key={i} />)}
+                  {!isLoading &&
+                    tableData.map((row, id) => (
+                      <StorageCheckTableRow
+                        key={row.id}
+                        row={row}
+                        selected={selected.includes(row.id)}
+                        onSelectRow={() => onSelectRow(row.id)}
+                        onDeleteRow={() => handleDeleteRow(Number(row.id))}
+                        onEditRow={() => handleEditRow(Number(row.id))}
+                      />
+                    ))}
                   <TableEmptyRows
                     height={denseHeight}
                     emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
                   />
-
                   <TableNoData isNotFound={isNotFound} />
                 </TableBody>
               </Table>
@@ -325,7 +295,7 @@ export default function WarehousePage() {
           </TableContainer>
 
           <TablePaginationCustom
-            count={warehouseData?.data?.response?.[0]?.total || 0}
+            count={storageCheckData?.data?.response?.[0]?.total || 0}
             page={page}
             rowsPerPage={rowsPerPage}
             onPageChange={(event, newPage) => {
@@ -340,7 +310,9 @@ export default function WarehousePage() {
       </Container>
     </>
   );
-}
+};
+
+export default StorageCheckPage;
 
 function applyFilter({
   inputData,
