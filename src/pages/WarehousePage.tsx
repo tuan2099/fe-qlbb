@@ -217,7 +217,7 @@ export default function WarehousePage() {
         <CustomBreadcrumbs
           heading={translate('Warehouse')}
           links={[
-            { name: `${translate('Home')}`, href: PATH_DASHBOARD.root },
+            { name: `${translate('HomePage')}`, href: PATH_DASHBOARD.root },
             { name: `${translate('Warehouse')}`, href: PATH_DASHBOARD.warehouse },
             { name: `${translate('WarehouseList')}` },
           ]}

@@ -13,7 +13,6 @@ export default function LoginPage() {
       <Helmet>
         <title> {translate('LoginPage')} | Minimal UI</title>
       </Helmet>
-
       <Login />
     </>
   );

@@ -60,6 +60,15 @@ const vn = {
   Home: `Trang chủ`,
   Profile: `Hồ sơ người dùng`,
   Account: `Cài đặt tài khoản`,
+  SorryPageNotFound: `Xin lỗi, trang không tìm thấy`,
+  PageNotFound: `404 - Trang không tìm thấy`,
+  DescriptionPageNotFound: `Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa. Vui lòng kiểm tra lại địa chỉ URL hoặc quay lại trang chủ.`,
+  BackToHome: `Quay lại trang chủ`,
+  Warehouse: `Kho hàng`,
+  HomePage: `Trang chủ`,
+  WarehouseList: `Danh sách kho hàng`,
+  CreateNewWarehouse: `Tạo kho hàng mới`,
+
 };
 
 export default vn;

@@ -32,6 +32,7 @@ import {
   TableHeadCustom,
   TableSelectedAction,
   TablePaginationCustom,
+  TableSkeleton,
 } from 'src/components/table';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -215,12 +216,12 @@ export default function PageOne() {
   return (
     <>
       <Helmet>
-        <title> {translate('UserPage')} | Minimal UI</title>
+        <title> {translate('UserPage')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <CustomBreadcrumbs
-          heading="Kho hàng"
+          heading={translate('User')}
           links={[
             { name: 'Trang chủ', href: PATH_DASHBOARD.root },
             { name: 'Người dùng', href: PATH_DASHBOARD.user.root },
@@ -305,7 +306,11 @@ export default function PageOne() {
                 />
 
                 <TableBody>
-                  {tableData.map((row) => (
+                  {isLoading &&
+                    Array(10)
+                      .fill(0)
+                      .map((_, i) => <TableSkeleton key={i} />)}
+                  {!isLoading && tableData.map((row) => (
                     <UserTableRow
                       key={row.id}
                       row={row}

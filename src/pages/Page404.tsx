@@ -17,7 +17,7 @@ export default function Page404() {
   return (
     <>
       <Helmet>
-        <title> {translate('404PageNotFound')} | Minimal UI</title>
+        <title> {translate('PageNotFound')} | PMC</title>
       </Helmet>
 
       <MotionContainer>
