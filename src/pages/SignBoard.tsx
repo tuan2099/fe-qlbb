@@ -151,9 +151,9 @@ const SignBoard = () => {
   const isFiltered = filterName !== '' || filterCode !== 'all' || filterManager !== 'all';
 
   const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterCode) ||
-    (!dataFiltered.length && !!filterManager);
+    (!dataFiltered?.length && !!filterName) ||
+    (!dataFiltered?.length && !!filterCode) ||
+    (!dataFiltered?.length && !!filterManager);
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -183,7 +183,7 @@ const SignBoard = () => {
     onSuccess: () => {
       refetch();
     },
-    onError: (err) => { },
+    onError: (err) => {},
   });
 
   const handleDeleteRow = (id: number) => {
@@ -276,7 +276,7 @@ const SignBoard = () => {
             <TableSelectedAction
               dense={dense}
               numSelected={selected.length}
-              rowCount={tableData.length}
+              rowCount={tableData?.length}
               onSelectAllRows={(checked) =>
                 onSelectAllRows(
                   checked,
@@ -298,13 +298,13 @@ const SignBoard = () => {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={tableData.length}
+                  rowCount={tableData?.length}
                   numSelected={selected.length}
                   onSort={onSort}
                   onSelectAllRows={(checked) =>
                     onSelectAllRows(
                       checked,
-                      tableData.map((row) => row.id)
+                      tableData?.map((row) => row.id)
                     )
                   }
                 />
@@ -315,7 +315,7 @@ const SignBoard = () => {
                       .fill(0)
                       .map((_, i) => <TableSkeleton key={i} />)}
                   {!isLoading &&
-                    tableData.map((row) => (
+                    tableData?.map((row) => (
                       <SignboardTableRow
                         key={row.id}
                         row={row}
@@ -327,7 +327,7 @@ const SignBoard = () => {
                     ))}
                   <TableEmptyRows
                     height={denseHeight}
-                    emptyRows={emptyRows(page, rowsPerPage, tableData.length)}
+                    emptyRows={emptyRows(page, rowsPerPage, tableData?.length)}
                   />
                   <TableNoData isNotFound={isNotFound} />
                 </TableBody>
@@ -368,15 +368,15 @@ function applyFilter({
   filterCode: string;
   filterManager: string;
 }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index] as const);
+  const stabilizedThis = inputData?.map((el, index) => [el, index] as const);
 
-  stabilizedThis.sort((a, b) => {
+  stabilizedThis?.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
 
-  inputData = stabilizedThis.map((el) => el[0]);
+  inputData = stabilizedThis?.map((el) => el[0]);
 
   if (filterName) {
     inputData = inputData.filter(
@@ -385,11 +385,11 @@ function applyFilter({
   }
 
   if (filterCode !== 'all') {
-    inputData = inputData.filter((warehosue) => warehosue.code === filterCode);
+    inputData = inputData?.filter((warehosue) => warehosue.code === filterCode);
   }
 
   if (filterManager !== 'all') {
-    inputData = inputData.filter((warehosue) => warehosue.manager_by === filterManager);
+    inputData = inputData?.filter((warehosue) => warehosue.manager_by === filterManager);
   }
 
   return inputData;
