@@ -68,7 +68,10 @@ const vn = {
   HomePage: `Trang chủ`,
   WarehouseList: `Danh sách kho hàng`,
   CreateNewWarehouse: `Tạo kho hàng mới`,
-
+  CreateUser: `Tạo người dùng mới`,
+  UserPage: `Trang người dùng`,
+  User: `Người dùng`,
+  UserList: `Danh sách người dùng`,
 };
 
 export default vn;

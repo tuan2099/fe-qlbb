@@ -223,9 +223,9 @@ export default function PageOne() {
         <CustomBreadcrumbs
           heading={translate('User')}
           links={[
-            { name: 'Trang chủ', href: PATH_DASHBOARD.root },
-            { name: 'Người dùng', href: PATH_DASHBOARD.user.root },
-            { name: 'Danh sách người dùng' },
+            { name: `${translate('Home')}`, href: PATH_DASHBOARD.root },
+            { name: `${translate('User')}`, href: PATH_DASHBOARD.user.root },
+            { name: `${translate('UserList')}` },
           ]}
           action={
             <>
