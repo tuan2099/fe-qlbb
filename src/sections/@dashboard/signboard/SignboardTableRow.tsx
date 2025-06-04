@@ -99,7 +99,7 @@ export default function SignboardTableRow({
         arrow="right-top"
         sx={{ width: 140 }}
       >
-        {hasPermission('storage_delete') && (
+        {hasPermission('signboard_delete') && (
           <MenuItem
             onClick={() => {
               handleOpenConfirm();
@@ -111,7 +111,7 @@ export default function SignboardTableRow({
             {translate('Delete')}
           </MenuItem>
         )}
-        {hasPermission('storage_update') && (
+        {hasPermission('signboard_edit') && (
           <MenuItem
             onClick={() => {
               onEditRow();
