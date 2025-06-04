@@ -14,6 +14,8 @@ import { addRole, getRoleDetail, updateRole } from 'src/apis/role.api';
 import { getPermisson } from 'src/apis/permission.api';
 import { useEffect, useState } from 'react';
 import LoadingScreen from 'src/components/loading-screen';
+// locales
+import { useLocales } from 'src/locales';
 
 type FormValue = {
   name: string;
@@ -36,6 +38,7 @@ const AddRole = () => {
   const [sortData, setSortData] = useState({});
   const { id } = useParams();
   const isAddMode = !Boolean(id);
+  const { translate } = useLocales();
 
   const permisson = useQuery({
     queryKey: ['permission'],
@@ -93,7 +96,12 @@ const AddRole = () => {
     onSuccess: () => {
       reset();
       isAddMode ? reset() : navigate('/dashboard/role');
-      enqueueSnackbar(isAddMode ? 'Tạo thành công' : 'Cập nhập thành công', { variant: 'success' });
+      enqueueSnackbar(
+        isAddMode ? `${translate('CreateSuccess')}` : `${translate('UpdateSuccess')}`,
+        {
+          variant: 'success',
+        }
+      );
     },
     onError: (err) => {
       enqueueSnackbar(err.message, { variant: 'error' });
@@ -104,12 +112,12 @@ const AddRole = () => {
     <>
       {permisson.isLoading && <LoadingScreen />}
       <Helmet>
-        <title> Role Page | Minimal UI</title>
+        <title> {translate('RolePage')} | PMC</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'xl'}>
         <Typography variant="h3" component="h1" paragraph>
-          Add Role
+          {isAddMode ? translate('CreateRole') : translate('EditInfomation')}
         </Typography>
 
         <FormProvider
@@ -117,7 +125,7 @@ const AddRole = () => {
           onSubmit={handleSubmit((data) => handleSubmitForm.mutate(data))}
         >
           <Stack spacing={3} paddingY={2}>
-            <RHFTextField name="name" label="Name" />
+            <RHFTextField name="name" label={translate('Name')} />
             {Object.entries(sortData).map(([key, items]) => {
               const typedItems = items as Permission[]; // Ép kiểu
               return (
@@ -135,7 +143,7 @@ const AddRole = () => {
               );
             })}
             <LoadingButton loading={handleSubmitForm.isPending} type="submit" variant="contained">
-              {isAddMode ? ' Tạo mới' : 'Cập nhập'}
+              {isAddMode ? `${translate('Create')}` : `${translate('Update')}`}
             </LoadingButton>
           </Stack>
         </FormProvider>

@@ -32,6 +32,7 @@ import {
   TableHeadCustom,
   TableSelectedAction,
   TablePaginationCustom,
+  TableSkeleton,
 } from 'src/components/table';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -302,6 +303,10 @@ export default function WarehousePage() {
                 />
 
                 <TableBody>
+                  {isLoading &&
+                    Array(10)
+                      .fill(0)
+                      .map((_, i) => <TableSkeleton key={i} />)}
                   {tableData.map((row) => (
                     <WarehouseTableRow
                       key={row.id}

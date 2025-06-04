@@ -134,7 +134,7 @@ export default function InvoiceNewEditAddress() {
       <Stack sx={{ width: 1 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
           <Typography variant="h6" sx={{ color: 'text.disabled' }}>
-            {translate('Supplier')}:
+            {translate('Suppliers')}:
           </Typography>
 
           <Button
@@ -192,7 +192,9 @@ function StorageInfo({ name, manager_by, note }: AddressInfoProps) {
       <Typography variant="body2" sx={{ mt: 1, mb: 0.5 }}>
         {translate('Manager')}: {manager_by}
       </Typography>
-      <Typography variant="body2">{translate('Note')}: {note}</Typography>
+      <Typography variant="body2">
+        {translate('Note')}: {note}
+      </Typography>
     </>
   );
 }
@@ -206,7 +208,9 @@ function SupplierInfo({ name, address, branch, region, phone, note }: any) {
       <Typography variant="subtitle2">{branch}</Typography>
       <Typography variant="subtitle2">{region}</Typography>
       <Typography variant="subtitle2">{phone}</Typography>
-      <Typography variant="body2">{translate('Note')}: {note}</Typography>
+      <Typography variant="body2">
+        {translate('Note')}: {note}
+      </Typography>
     </>
   );
 }

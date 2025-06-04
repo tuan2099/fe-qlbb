@@ -171,7 +171,8 @@ export default function InvoiceNewEditForm({ isEdit, currentInvoice }: Props) {
           loading={handleCreate.isPending || handleUpdate.isPending}
           onClick={handleSubmit(handleCreateAndSend)}
         >
-          {isEdit ? `${translate('Update')}` : `${'Create'}`} {translate('WarehouseReceipt')}
+          {isEdit ? `${translate('Update')}` : `${translate('Create')}`}{' '}
+          {translate('WarehouseReceipt')}
         </LoadingButton>
       </Stack>
     </FormProvider>

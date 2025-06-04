@@ -104,7 +104,12 @@ const AddSupplier = () => {
     onSuccess: () => {
       reset();
       isAddMode ? reset() : navigate('/dashboard/supplier');
-      enqueueSnackbar(isAddMode ? `${translate('CreateNewSupplierSuccess')}` : `${translate('UpdateSupplierSuccess')}`, { variant: 'success' });
+      enqueueSnackbar(
+        isAddMode
+          ? `${translate('CreateNewSupplierSuccess')}`
+          : `${translate('UpdateNewSupplierSuccess')}`,
+        { variant: 'success' }
+      );
     },
     onError: (err) => {
       enqueueSnackbar(err.message, { variant: 'error' });

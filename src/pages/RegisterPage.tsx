@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-// form 
+// form
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
@@ -14,13 +14,12 @@ import { LoadingButton } from '@mui/lab';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { registerUser } from 'src/apis/user.api';
 import { getRoles } from 'src/apis/role.api';
-// Component 
+// Component
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import RHFDatePicker from 'src/components/hook-form/RHFDatePicker';
 import { useSettingsContext } from '../components/settings';
 import LoadingScreen from 'src/components/loading-screen';
 import { useSnackbar } from 'notistack';
-
 
 type FormValue = {
   name: string;
@@ -128,9 +127,13 @@ const RegisterPage = () => {
                 <MenuItem value="Nam">{translate('Male')}</MenuItem>
                 <MenuItem value="Nữ">{translate('FeMale')}</MenuItem>
               </RHFSelect>
-              <RHFTextField name="phone" label="Phone" />
-              <RHFTextField name="position" label="Position" />
-              <RHFSelect name="roles" label="Role" SelectProps={{ native: false }}>
+              <RHFTextField name="phone" label={translate('Phone')} />
+              <RHFTextField name="position" label={translate('Chức vụ')} />
+              <RHFSelect
+                name="roles"
+                label={translate('Quyền hạn')}
+                SelectProps={{ native: false }}
+              >
                 {RoleData &&
                   RoleData?.data.response[0].data.map((role: any) => (
                     <MenuItem key={role.id} value={role.id}>

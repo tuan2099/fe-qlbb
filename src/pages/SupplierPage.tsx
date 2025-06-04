@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useSettingsContext } from '../components/settings';
 // @mui
 import {
@@ -17,11 +16,8 @@ import {
   Container,
   IconButton,
   TableContainer,
-  Grid,
-  Typography
 } from '@mui/material';
 // api
-import { deleteUser, getAllUser } from 'src/apis/user.api';
 import { deleteSupplier, getAllSupplier } from 'src/apis/supplier.api';
 // components
 import {
@@ -33,11 +29,12 @@ import {
   TableHeadCustom,
   TableSelectedAction,
   TablePaginationCustom,
+  TableSkeleton,
 } from 'src/components/table';
 import CustomBreadcrumbs from '../components/custom-breadcrumbs';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
-// type 
+// type
 import { ISupplier } from 'src/types/supplier.type';
 // sections
 import { SupplierTableRow, SupplierTableToolbar } from '../sections/@dashboard/supplier';
@@ -173,9 +170,7 @@ const SupplierPage = () => {
     onSuccess: () => {
       refetch();
     },
-    onError: (err) => {
-
-    },
+    onError: (err) => {},
   });
 
   const handleDeleteRow = (id: number) => {
@@ -186,7 +181,6 @@ const SupplierPage = () => {
     // const deleteRows = tableData.filter((row) => !selected.includes(row.id));
     // setSelected([]);
     // setTableData(deleteRows);
-
     // if (page > 0) {
     //   if (selected.length === dataInPage.length) {
     //     setPage(page - 1);
@@ -299,6 +293,10 @@ const SupplierPage = () => {
                 />
 
                 <TableBody>
+                  {isLoading &&
+                    Array(10)
+                      .fill(0)
+                      .map((_, i) => <TableSkeleton key={i} />)}
                   {tableData.map((row) => (
                     <SupplierTableRow
                       key={row.id}
@@ -332,7 +330,6 @@ const SupplierPage = () => {
             dense={dense}
             onChangeDense={onChangeDense}
           />
-
         </Card>
       </Container>
     </>
@@ -340,7 +337,6 @@ const SupplierPage = () => {
 };
 
 export default SupplierPage;
-
 
 function applyFilter({
   inputData,

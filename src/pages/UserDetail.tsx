@@ -59,9 +59,9 @@ const UserDetail = () => {
 
   const LoginSchema = Yup.object().shape({
     phone: Yup.string().required(`${translate('PhoneIsRequired')}`),
-    gender: Yup.string().required(`${translate('Gender is required')}`),
-    position: Yup.string().required(`${translate('Position is required')}`),
-    birthday: Yup.string().required(`${translate('Birthday is required')}`),
+    gender: Yup.string().required(`${translate('Genderisrequired')}`),
+    position: Yup.string().required(`${translate('Positionisrequired')}`),
+    birthday: Yup.string().required(`${translate('Birthdayisrequired')}`),
   });
 
   const handleEditClick = () => {
@@ -200,7 +200,7 @@ const UserDetail = () => {
           <Grid container spacing={1}>
             <Grid item xs={1}>
               <Typography variant="body2" fontWeight={600}>
-                {translate('Role')}:
+                {translate('Roles')}:
               </Typography>
             </Grid>
             <Grid item xs={1}>
@@ -231,13 +231,17 @@ const UserDetail = () => {
               onSubmit={handleSubmit((data) => handleUpdate.mutate(data))}
             >
               <Stack spacing={3} paddingY={2}>
-                <RHFTextField name="phone" label="Phone" />
-                <RHFSelect name="gender" label="Gender" SelectProps={{ native: false }}>
+                <RHFTextField name="phone" label={translate('Phone')} />
+                <RHFSelect
+                  name="gender"
+                  label={translate('Gender')}
+                  SelectProps={{ native: false }}
+                >
                   <MenuItem value="Nam">{translate('Male')}</MenuItem>
                   <MenuItem value="Nữ">{translate('FeMale')}</MenuItem>
                 </RHFSelect>
-                <RHFTextField name="position" label="Position" />
-                <RHFDatePicker name="birthday" label="Birthday" />
+                <RHFTextField name="position" label={translate('Position')} />
+                <RHFDatePicker name="birthday" label={translate('Birthday')} />
                 {RoleData && userData?.data.response[0].position === 'admin' && (
                   <RHFMultiCheckbox
                     name="roles"
